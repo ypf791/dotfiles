@@ -1,0 +1,63 @@
+#!/bin/bash
+ScriptPath=`dirname $(readlink -f $0)`
+CreatePath=$ScriptPath/..
+TemplatePath=$ScriptPath/templates
+
+_show_help() {
+	cat >&2 << EOF
+USAGE: create_target [-h] <target...>
+OPTIONS
+	-h	show this message
+ARGUMENTS
+	list of targets that should be created
+EOF
+}
+
+_mktarget() {
+	rtn=0
+	echo "===> generate $1"
+	if ! mkdir "$CreatePath/$1" >/dev/null 2>&1; then
+		echo "[Error] _mktarget: $1 already exists!!" >&2
+		rtn=1
+	fi
+	echo "Cloning template Makefile..."
+	if ! cp $TemplatePath/target.mak $CreatePath/$1/Makefile; then
+		echo "[Error] _mktarget: failed to create Makefile!!" >&2
+		rtn=2
+	fi
+	echo "Creating default backup.list..."
+	if ! touch $CreatePath/$1/backup.list; then
+		echo "[Error] _mktarget: failed to create backup.list!!" >&2
+		rtn=3
+	fi
+	echo "Linking to target.list..."
+	if [ 0 -eq $rtn ]; then
+		cd $ScriptPath/../target.list
+		ln -s $CreatePath/$1
+	fi
+	echo "<=== generate $1 done [$rtn]"
+	return $rtn
+}
+
+OPTIND= OPTARG= opt=
+while getopts "hp:" opt; do
+	case $opt in
+	h)	_show_help; exit
+		;;
+	?)	_show_help; exit 1
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+if [ 0 -eq $# ]; then
+	echo "[Error] global: You should assign target(s) to create!!" >&2
+	_show_help
+	exit 1
+fi
+
+while [ 0 -lt $# ]; do
+	_mktarget $1
+	shift
+done

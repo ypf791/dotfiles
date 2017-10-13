@@ -1,0 +1,6 @@
+set tabstop=4
+set autoindent
+
+set mouse=n
+set ttymouse=xterm2
+

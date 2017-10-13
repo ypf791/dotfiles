@@ -1,0 +1,148 @@
+#!/bin/bash
+# TODO:
+# - convert the diff file to correct file name 
+# such that vim can recognize it.
+# - don't bind on git diff
+
+GDF_WRAPPER=/usr/local/bin/gdf_wrapper
+
+SetupWrapper()
+{
+	cat > $GDF_WRAPPER <<'EOF'
+#!/bin/bash
+mkdir -p $GDF_TMPDIR 2>/dev/null;
+TMPDIR=${TMPDIR:-/tmp/}
+if [ "${1:0:${#TMPDIR}}" = "$TMPDIR" ]; then
+	cp $1 $GDF_TMPDIR/ 2>/dev/null;
+	echo -n "$GDF_TMPDIR/`basename $1` ";
+else
+	echo -n "$1 ";
+fi
+if [ "${2:0:${#TMPDIR}}" = "$TMPDIR" ]; then
+	cp $2 $GDF_TMPDIR/ 2>/dev/null;
+	echo $GDF_TMPDIR/`basename $2`;
+else
+	echo $2;
+fi
+exit 0;
+EOF
+	chmod +x $GDF_WRAPPER
+}
+
+CheckGitDiffWrapper()
+{
+	local ans
+	if [ -x $GDF_WRAPPER ]; then
+		return
+	fi
+
+	echo "This tool requires a wrapper scripts - $GDF_WRAPPER !"
+	echo -n "Do you want to INSTALL [Y/n]? "
+	read ans
+	if [ "$ans" = N ] || [ "$ans" = n ]; then
+		echo "Stopped. lack of $GDF_WRAPPER !"
+		exit 1
+	else
+		SetupWrapper
+	fi
+}
+
+toGitRoot()
+{
+	while true; do
+		local cwd=`pwd`
+		if [ -d "$cwd/.git" ]; then
+			break;
+		fi
+		cd ..
+	done
+}
+
+Usage() {
+	echo "usage: $(basename $0) show [tag/SHA1]"
+	echo "	show a commit diff"
+	git diff -h 2>&1 | sed 's/git diff/gdf/g'
+	echo "	accept the same parameters of git diff too"
+}
+
+case "$1" in
+	"-h")
+		Usage
+		exit 1
+		;;
+	"show")
+		if [ $# -eq 1 ]; then
+			arg2="HEAD"
+		else
+			arg2=$2
+		fi
+		set -- "$arg2^" "$arg1"
+		;;
+esac
+
+CheckGitDiffWrapper
+
+if [ 'Darwin' = `uname -s` ]; then
+	tempDir=`mktemp -ud -t ".gdf_XXXX"` || exit 1
+	temprc=`mktemp -u -t "vim.XXXX"` || exit 1
+else
+	tempDir=`mktemp -ud -p . -t ".gdf_XXXX"` || exit 1
+	temprc=`mktemp -up $tempDir -t "vim.XXXX"` || exit 1
+fi
+export GDF_TMPDIR="$tempDir"
+
+_exit()
+{
+	rm -rf "$tempDir"
+	exit $1
+}
+
+for arg in "$@"; do
+	if [ x"$arg" = "x-w" ]; then
+		diff_ignore_white_space=on
+	fi
+done
+
+# Since diff.external would affect the behavior of 'git diff'
+# use difftool instead
+files=`git difftool --no-prompt --extcmd $GDF_WRAPPER $@ 2>&1`
+if [ $? -ne 0 ]; then 
+	echo "$files"
+	exit 1
+fi
+
+toGitRoot
+if [ $? -ne 0 ]; then
+	echo "Fail to get diff files! "
+	echo "$files"
+	_exit 1
+fi
+parse_filelist() 
+{
+	while [ $# -ge 2 ]; do
+		if [ $2 = "/dev/null" ]; then
+			# a newly added file
+			echo "tabe $1" >> $temprc
+		else
+			echo "au! BufEnter *" >> $temprc
+			echo "tabe $1" >> $temprc
+			echo "vert diffsplit $2" >> $temprc
+		fi
+		shift 2
+	done
+}
+
+parse_filelist $files
+
+if [ -s $temprc ]; then
+	echo "tabfirst" >> $temprc
+	echo "tabclose" >> $temprc
+	if [ "$diff_ignore_white_space" ]; then
+		echo "set diffopt+=iwhite" >> $temprc
+	fi
+	vim -S $temprc 
+else
+	echo "No difference found !"
+fi
+
+_exit 0

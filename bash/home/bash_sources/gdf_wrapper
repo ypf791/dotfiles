@@ -1,0 +1,16 @@
+#!/bin/bash
+mkdir -p $GDF_TMPDIR 2>/dev/null;
+TMPDIR=${TMPDIR:-/tmp/}
+if [ "${1:0:${#TMPDIR}}" = "$TMPDIR" ]; then
+	cp $1 $GDF_TMPDIR/ 2>/dev/null;
+	echo -n "$GDF_TMPDIR/`basename $1` ";
+else
+	echo -n "$1 ";
+fi
+if [ "${2:0:${#TMPDIR}}" = "$TMPDIR" ]; then
+	cp $2 $GDF_TMPDIR/ 2>/dev/null;
+	echo $GDF_TMPDIR/`basename $2`;
+else
+	echo $2;
+fi
+exit 0;

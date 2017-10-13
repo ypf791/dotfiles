@@ -1,0 +1,6 @@
+github.com/tpope/vim-pathogen
+github.com/tpope/vim-sensible
+github.com/tpope/vim-fugitive
+github.com/guns/xterm-color-table.vim:xterm-color-table
+github.com/tmux-plugins/tpm
+

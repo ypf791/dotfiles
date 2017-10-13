@@ -1,0 +1,7 @@
+_root/
+_bkp/
+*/backup.list
+backup.list
+ext_proj/
+
+!.gitignore

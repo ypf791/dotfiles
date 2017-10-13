@@ -1,0 +1,55 @@
+#!/bin/bash
+ScriptPath=`dirname $(readlink -f $0)`
+
+_show_help() {
+	cat >&2 << EOF
+USAGE: backup [-h] [-f backup_list] [-o output]
+OPTIONS
+	-h	show this message
+	-f	specify the file listing all those should be backup.
+	-o	specify the directory to store backup files.
+		default to be /tmp/.config_backup
+EOF
+}
+
+BKP_FILE_LIST=
+OUT_PATH=/tmp/.config_backup
+
+OPTIND= OPTARG= opt=
+while getopts "hf:o:" opt; do
+	case $opt in
+	f)	BKP_FILE_LIST=$OPTARG
+		;;
+	o)	OUT_PATH=$OPTARG
+		;;
+	h)	_show_help; exit
+		;;
+	?)	 _show_help; exit 1
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+if [ 0 -ne $# ]; then
+	echo "[Notice] global: discard all arguments"
+fi
+
+if [ -z "$BKP_FILE_LIST" ]; then
+	echo "[Notice] global: specify a list to backup"
+	exit 0
+fi
+
+if [ ! -f "$BKP_FILE_LIST" ]; then
+	echo "[Error] global: specified file unavailable!!" >&2
+	exit 1
+fi
+
+mkdir -p "$OUT_PATH"
+
+for f in `cat $BKP_FILE_LIST`; do
+	if [ -f "$f" ]; then
+		install -v -m `stat -c %a -- $f` -D "`readlink -f $f`" "`readlink -f $OUT_PATH/$f`" && rm -f "$f"
+	fi
+done
+

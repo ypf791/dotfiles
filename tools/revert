@@ -1,0 +1,54 @@
+#!/bin/bash
+ScriptPath=`dirname $(readlink -f $0)`
+
+_show_help() {
+	cat >&2 << EOF
+USAGE: revert [-h] [-f file_list] <backup_directory>
+OPTIONS
+	-h	show this message
+	-f	specify the file listing what has been installed
+EOF
+}
+
+INSTALLED_FILE_LIST=
+
+OPTIND= OPTARG= opt=
+while getopts "hf:" opt; do
+	case $opt in
+	f)	INSTALLED_FILE_LIST=$OPTARG
+		;;
+	h)	_show_help; exit
+		;;
+	?)	 _show_help; exit 1
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+if [ 1 -gt $# ]; then
+	echo "[Error] global: One argument is required to specify the position of backup files!!"
+	exit 1
+fi
+
+if [ -z "$INSTALLED_FILE_LIST" ]; then
+	echo "[Notice] global: specify a list to revert"
+	exit 0
+fi
+
+BKP_DIR=$1
+if [ ! -d "$BKP_DIR" ]; then
+	echo "[Error] global: The first argument should be a directory!!"
+	exit 2
+fi
+
+for f in `cat $INSTALLED_FILE_LIST`; do
+	echo "`readlink -f /$f` ---> /dev/null"
+	rm -f /$f
+done
+
+cd "$BKP_DIR"
+for f in `find . -type f`; do
+	install -v -m `stat -c %a -- $f` -D "`readlink -f $f`" "`readlink -f /$f`" && rm -f "$f"
+done
+

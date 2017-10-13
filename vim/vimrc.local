@@ -1,0 +1,23 @@
+set background=dark
+
+au BufReadPost,BufNewFile [Mm]akefile* :set syntax=make
+
+set listchars=tab:→∙,trail:~
+set list
+hi TabAndTrail ctermfg=DarkGrey
+autocmd WinEnter,VimEnter,BufWinEnter,BufRead * match TabAndTrail /\t\|\s\+$/
+
+set hlsearch
+noremap <F4> :set hlsearch! hlsearch?<CR>
+
+set nu
+hi LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
+noremap <F3> :set relativenumber! relativenumber?<CR>
+
+set cursorline
+hi CursorLine cterm=NONE ctermbg=8
+
+hi DiffAdd cterm=none ctermbg=65
+hi DiffDelete cterm=none ctermfg=8 ctermbg=167
+hi DiffChange cterm=none ctermbg=4
+hi DiffText cterm=underline,bold ctermbg=4
