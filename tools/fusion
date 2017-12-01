@@ -1,14 +1,14 @@
 #!/bin/bash
 
 BKP_LIST=
-EXT_FILES=
+EXT_ROOT=
 
 OPTIND= OPTARG= opt=
-while getopts "o:i:" opt; do
+while getopts "o:r:" opt; do
 	case $opt in
 	o)	BKP_LIST=$OPTARG
 		;;
-	i)	EXT_FIELS=$OPTARG
+	r)	EXT_ROOT=$OPTARG
 		;;
 	esac
 done
@@ -16,14 +16,15 @@ done
 shift $((OPTIND-1))
 
 BKP_LIST_TMP=`mktemp ${BKP_LIST}-XXXX.tmp`
-touch $BKP_LIST_TMP
+
 while [ 0 -lt $# ]; do
 	cat $1 >> $BKP_LIST_TMP
 	shift
 done
 
-for file in $EXT_FILES; do
-	echo $file >> $BKP_LIST_TMP
+for file in `cd $EXT_ROOT; find . -type f -o -type l`; do
+	echo ${file#.} >> $BKP_LIST_TMP
 done
 
 cat $BKP_LIST_TMP | sort -u > $BKP_LIST
+rm -f $BKP_LIST_TMP

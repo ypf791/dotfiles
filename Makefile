@@ -52,7 +52,7 @@ pre.$(BKP_LIST):
 
 $(BKP_LIST): pre.$(BKP_LIST) $(MERGE_TOOL) $(TARGETS)
 	@echo "gathering backup list..."
-	@$(MERGE_TOOL) -o $@ -i "`cd $(SRC_PATH); find -type f`" -- $(addsuffix /$(BKP_LIST),$(TARGETS))
+	@$(MERGE_TOOL) -o $@ -r $(SRC_PATH) -- $(addsuffix /$(BKP_LIST),$(TARGETS))
 	@echo "<==== $(BKP_LIST) complete"
 
 $(INS_LIST): $(SRC_PATH)
