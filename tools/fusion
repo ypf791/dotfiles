@@ -1,1 +1,29 @@
 #!/bin/bash
+
+BKP_LIST=
+EXT_FILES=
+
+OPTIND= OPTARG= opt=
+while getopts "o:i:" opt; do
+	case $opt in
+	o)	BKP_LIST=$OPTARG
+		;;
+	i)	EXT_FIELS=$OPTARG
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+BKP_LIST_TMP=`mktemp ${BKP_LIST}-XXXX.tmp`
+touch $BKP_LIST_TMP
+while [ 0 -lt $# ]; do
+	cat $1 >> $BKP_LIST_TMP
+	shift
+done
+
+for file in $EXT_FILES; do
+	echo $file >> $BKP_LIST_TMP
+done
+
+cat $BKP_LIST_TMP | sort -u > $BKP_LIST
