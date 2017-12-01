@@ -14,4 +14,4 @@ BACKUP_TOOL=$(PROJ_ROOT)tools/backup
 MERGE_TOOL=$(PROJ_ROOT)tools/fusion
 
 BKP_LIST=backup.list
-INSTALLED_LIST=installed.list
+INS_LIST=installed.list

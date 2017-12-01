@@ -21,7 +21,7 @@ while getopts "hf:" opt; do
 		;;
 	h)	_show_help; exit
 		;;
-	?)	 _show_help; exit 1
+	?)	_show_help; exit 1
 		;;
 	esac
 done
