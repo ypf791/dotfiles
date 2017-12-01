@@ -1,66 +1,77 @@
 include Makefile.inc
 
-CHECKABLE=all install revert clean
+BUILDERS=all global local
+CHECKABLE=$(BUILDERS) install revert clean
 TARGETS=$(shell ls target.list)
 
 .PHONY: first
-.PHONY: all install revert clean
-.PHONY: $(addprefix check.,$(CHECKABLE))
-.PHONY: targets.pre $(TARGETS)
+.PHONY: $(addprefix say.,$(BUILDERS))
+.PHONY: $(CHECKABLE) $(addprefix check.,$(CHECKABLE))
+.PHONY: pre.$(BKP_LIST) pre.targets $(TARGETS)
 
 first: all
 
-targets.pre:
+pre.targets:
 	@echo "find targets: $(TARGETS)"
 
-$(TARGETS): targets.pre
+$(TARGETS): pre.targets
 	@echo "======> $@"
-	@$(MAKE) -C $@ $(MAKECMDGOALS)
+	@$(MAKE) -C `readlink -f target.list/$@` $(MAKECMDGOALS)
 	@echo "<====== $@ complete"
 
-all global local: %: check.% $(TARGETS)
+$(BUILDERS): %: check.% $(TARGETS)
 	@echo "<== make $@ complete!!"
 
 install: check.install $(BACKUP_TOOL) $(INSTALL_TOOL)
-	@echo "prepare backup.list..."
+	@echo "prepare $(BKP_LIST)..."
 	@make $(BKP_LIST)
 	@echo "invoking backup tool..."
-	@$(BACKUP_TOOL) -f $< -o $(BKP_PATH)
+	@$(BACKUP_TOOL) -f $(BKP_LIST) -- $(BKP_PATH)
+	@rm -vf $(BKP_LIST)
 	@echo "invoking install tool..."
 	@$(INSTALL_TOOL) $(SRC_PATH)
-	@echo "making $(INSTALLED_LIST) for revert..."
-	@touch $(INSTALLED_LIST)
-	@cd $(SRC_PATH); find -type f > ../$(INSTALLED_LIST)
 	@echo "<== make $@ complete!!"
 
-revert: check.revert $(REVERT_TOOL) $(INSTALLED_LIST)
+revert: check.revert $(REVERT_TOOL)
+	@echo "preparing $(INS_LIST)..."
+	@make $(INS_LIST)
 	@echo "invoking revert tool..."
-	@$(REVERT_TOOL) -f $(INSTALLED_LIST) -- $(BKP_PATH)
+	@$(REVERT_TOOL) -f $(INS_LIST) -- $(BKP_PATH)
+	@rm -vf $(INS_LIST)
+	@echo "cleaning backup files..."
+	@rm -rf $(BKP_PATH)
 	@echo "<== make $@ complete!!"
 
 clean: say.clean $(TARGETS)
 	@echo "cleaning..."
-	@rm -vrf $(BKP_LIST) $(INSTALLED_LIST) $(SRC_PATH) $(BKP_PATH)
+	@rm -vrf $(BKP_LIST) $(INS_LIST) $(SRC_PATH) $(BKP_PATH)
 	@echo "<== make $@ complete!!"
 
-$(BKP_LIST).pre:
+pre.$(BKP_LIST):
 	@echo "====> $(BKP_LIST)"
 
-$(BKP_LIST): $(BKP_LIST).pre $(MERGE_TOOL) $(TARGETS)
+$(BKP_LIST): pre.$(BKP_LIST) $(MERGE_TOOL) $(TARGETS)
 	@echo "gathering backup list..."
-	@$(MERGE_TOOL) -o $@ -i `find $(SRC_PATH) -type f` -- $(addsuffix /$(BKP_LIST),$(TARGETS))
+	@$(MERGE_TOOL) -o $@ -i "`find $(SRC_PATH) -type f`" -- $(addsuffix /$(BKP_LIST),$(TARGETS))
 	@echo "<==== $(BKP_LIST) complete"
+
+$(INS_LIST): $(SRC_PATH)
+	@echo "====> $(INS_LIST)"
+	@echo "listing $(SRC_PATH)..."
+	@cd $(SRC_PATH); find -type f > ../$(INS_LIST)
+	@echo "<==== $(INS_LIST) complete"
 
 say.%:
 	@echo "==> make $*"
 
-check.all check.global check.local: check.%: say.%
+$(addprefix check.,$(BUILDERS)): check.%: say.%
 	@test ! -d $(SRC_PATH)
-	@mkdir -p $(SRC_PATH) $(BKP_PATH)
+	@install -d -m 755 -D $(SRC_PATH)
 
 check.install: say.install
-	@test -d $(SRC_PATH)
+	@test -d $(SRC_PATH) -a ! -d $(BKP_PATH)
+	@install -d -m 755 -D $(BKP_PATH)
 
 check.revert: say.revert
-	@test -d $(BKP_PATH) -a -f $(INSTALLED_LIST)
+	@test -d $(SRC_PATH) -a -d $(BKP_PATH)
 

@@ -3,24 +3,21 @@ ScriptPath=`dirname $(readlink -f $0)`
 
 _show_help() {
 	cat >&2 << EOF
-USAGE: backup [-h] [-f backup_list] [-o output]
+USAGE: backup [-h] [-f backup_list] <output_directory>
 OPTIONS
 	-h	show this message
 	-f	specify the file listing all those should be backup.
-	-o	specify the directory to store backup files.
-		default to be /tmp/.config_backup
+ARGUMENTS
+	specify the directory to store backup files. default to be /tmp/.config_backup
 EOF
 }
 
 BKP_FILE_LIST=
-OUT_PATH=/tmp/.config_backup
 
 OPTIND= OPTARG= opt=
-while getopts "hf:o:" opt; do
+while getopts "hf:" opt; do
 	case $opt in
 	f)	BKP_FILE_LIST=$OPTARG
-		;;
-	o)	OUT_PATH=$OPTARG
 		;;
 	h)	_show_help; exit
 		;;
@@ -31,8 +28,9 @@ done
 
 shift $((OPTIND-1))
 
-if [ 0 -ne $# ]; then
-	echo "[Notice] global: discard all arguments"
+if [ 1 -gt $# ]; then
+	echo "[Error] global: One argument is required to specify the position of backup files!!"
+	exit 1
 fi
 
 if [ -z "$BKP_FILE_LIST" ]; then
@@ -45,11 +43,12 @@ if [ ! -f "$BKP_FILE_LIST" ]; then
 	exit 1
 fi
 
-mkdir -p "$OUT_PATH"
+BKP_DIR=${1:-/tmp/.config_backup}
+mkdir -p "$BKP_DIR"
 
 for f in `cat $BKP_FILE_LIST`; do
 	if [ -f "$f" ]; then
-		install -v -m `stat -c %a -- $f` -D "`readlink -f $f`" "`readlink -f $OUT_PATH/$f`" && rm -f "$f"
+		install -v -m `stat -c %a -- $f` -D "`readlink -f $f`" "`readlink -f $BKP_DIR/$f`" && rm -f "$f"
 	fi
 done
 

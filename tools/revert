@@ -3,10 +3,12 @@ ScriptPath=`dirname $(readlink -f $0)`
 
 _show_help() {
 	cat >&2 << EOF
-USAGE: revert [-h] [-f file_list] <backup_directory>
+USAGE: revert [-h] [-f installed_list] <backup_directory>
 OPTIONS
 	-h	show this message
 	-f	specify the file listing what has been installed
+ARGUMENTS
+	specify the directory storing backup files. must given
 EOF
 }
 
@@ -36,6 +38,11 @@ if [ -z "$INSTALLED_FILE_LIST" ]; then
 	exit 0
 fi
 
+if [ ! -f "$INSTALLED_FILE_LIST" ]; then
+	echo "[Error] global: specified file unavailable!!" >&2
+	exit 1
+fi
+
 BKP_DIR=$1
 if [ ! -d "$BKP_DIR" ]; then
 	echo "[Error] global: The first argument should be a directory!!"
@@ -43,8 +50,7 @@ if [ ! -d "$BKP_DIR" ]; then
 fi
 
 for f in `cat $INSTALLED_FILE_LIST`; do
-	echo "`readlink -f /$f` ---> /dev/null"
-	rm -f /$f
+	rm -vf `readlink -f /$f`
 done
 
 cd "$BKP_DIR"
