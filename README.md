@@ -6,9 +6,9 @@
 
 1. Starting from a brand new system, use
 ```bash
-type git >/dev/null 2>&1 || apt install -y git; \
-git clone --depth 1 https://github.com/ypf791/dotfiles.git ~/.dotfiles; \
-~/.dotfiles/prepare.sh
+cd
+wget https://raw.githubusercontent.com/ypf791/dotfiles/master/prepare.sh -O ~/prepare.sh
+sh prepare.sh
 ```
 2. To build the targets and deploy them, use
 ```bash
