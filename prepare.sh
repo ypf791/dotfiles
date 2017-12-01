@@ -1,6 +1,6 @@
 #!/bin/bash
 
-UseSSHKey=
+UseSSHKey=on
 SSHKeyName=id_rsa
 
 Echo() {
@@ -53,23 +53,30 @@ if [ "$UseSSHKey" ]; then
 			echo
 			echo "please copy the public key above, and"
 		fi
-		echo "register it to your Github account if needed."
-		read -p "press any key to continue..." ___key
-		unset ___key
+		echo "register it to your Github account to go on cloning projects"
+		read -p "Are you ready to go on? (Y/n)" key
+		if [ "xn" = "x$key" -o "xN" = "x$key" ]; then
+			exit 0
+		fi
 	else
 		echo "ssh key not found!!"
 		echo "does ssh-keygen failed?"
+		exit 1
 	fi
-
 fi
+
+Echo "dotfile project"
+
+cd
+git clone https://github.com/ypf791/dotfiles.git
 
 Echo "dependent project"
 
-mkdir -p ext_proj; cd ext_proj
+mkdir -p dotfiles/ext_proj; cd dotfiles/ext_proj
 for proj in `cat ../prepare.ext.list`; do
 	proj_name=${proj##*/}
 	proj_name=${proj_name##*:}
 	proj_path=https://${proj%:*}.git
-	[ -d $proj_name ] && echo "$proj_name already exists" || git clone $proj_path $proj_name
+	[ -e "$proj_name" ] && echo "$proj_name already exists" || git clone $proj_path $proj_name
 done
 cd ..
