@@ -8,13 +8,18 @@ CHECKABLE=
 
 first: all
 
-say:
-	@echo "preparing files in $(notdir $(SRC_PATH))..."
+all:
+	@make global
+	@make local
 
-all: say
-	@echo "This is the default rule of $(notdir $(SRC_PATH)); override to have your target build correctly"
+global:
+
+local:
 
 clean:
 
 $(BKP_LIST):
 	@touch $@
+
+say.%:
+	@echo "preparing $* files in $(notdir $(SRC_PATH))..."

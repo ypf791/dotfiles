@@ -18,7 +18,7 @@ $(TARGETS): targets.pre
 	@$(MAKE) -C $@ $(MAKECMDGOALS)
 	@echo "<====== $@ complete"
 
-all: check.all $(TARGETS)
+all global local: %: check.% $(TARGETS)
 	@echo "<== make $@ complete!!"
 
 install: check.install $(BACKUP_TOOL) $(INSTALL_TOOL)
@@ -54,7 +54,7 @@ $(BKP_LIST): $(BKP_LIST).pre $(MERGE_TOOL) $(TARGETS)
 say.%:
 	@echo "==> make $*"
 
-check.all: say.all
+check.all check.global check.local: check.%: say.%
 	@test ! -d $(SRC_PATH)
 	@mkdir -p $(SRC_PATH) $(BKP_PATH)
 
