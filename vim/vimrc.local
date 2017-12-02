@@ -2,7 +2,7 @@ set background=dark
 
 au BufReadPost,BufNewFile [Mm]akefile* :set syntax=make
 
-set listchars=tab:→∙,trail:~
+set listchars=tab:>∙,trail:~
 set list
 hi TabAndTrail ctermfg=DarkGrey
 autocmd WinEnter,VimEnter,BufWinEnter,BufRead * match TabAndTrail /\t\|\s\+$/
