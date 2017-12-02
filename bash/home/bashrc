@@ -26,7 +26,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-xterm-color)
+xterm-color|*-256color)
 	color_prompt=yes
 	;;
 esac
@@ -34,7 +34,7 @@ esac
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
-force_color_prompt=yes
+#force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
 	if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
@@ -96,12 +96,10 @@ if [ -f ~/.bash_aliases ]; then
 	. ~/.bash_aliases
 fi
 
-# Sources definitions.
-# You may want to put all your scripts into a separate hidden folder
-# like ~/.bash_sources, instead of adding them here directly.
-if [ -d ~/.bash_sources ]; then
-	for single_script in `cat ~/.bash_sources`; do
-		. $single_script
-	done
+# User-defined scripts
+if [ -d ~/.bashrc.d ]; then
+	PATH=$PATH:~/.bashrc.d
 fi
 
+# export TERM for screens
+export TERM_SCREEN screen-${TERM#*-}
