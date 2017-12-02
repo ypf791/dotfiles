@@ -1,9 +1,11 @@
 include ../Makefile.inc
 
 CHECKABLE=
+SPEAKERS=
 
 .PHONY: first
-.PHONY: all clean
+.PHONY: all global local clean
+.PHONY: $(addprefix say.,$(SPEAKERS))
 .PHONY: $(addprefix check.,$(CHECKABLE))
 
 first: all
@@ -13,8 +15,10 @@ all:
 	@make local
 
 global:
+	@echo "default rule for $@; override to have your target build correctly"
 
 local:
+	@echo "default rule fo $@; override to have your target build correctly"
 
 clean:
 

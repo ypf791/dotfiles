@@ -1,19 +1,24 @@
 include ../Makefile.inc
 
 CHECKABLE=
+SPEAKERS=
 
 .PHONY: first
-.PHONY: all clean
+.PHONY: all global local clean
+.PHONY: $(addprefix say.,$(SPEAKERS))
 .PHONY: $(addprefix check.,$(CHECKABLE))
 
 first: all
 
-all: say.all
-	@echo "This is the default rule of $(notdir $(SRC_PATH)); override to have your target build correctly"
+all:
+	@make global
+	@make local
 
 global:
+	@echo "default rule for $@; override to have your target build correctly"
 
 local:
+	@echo "default rule fo $@; override to have your target build correctly"
 
 clean:
 
