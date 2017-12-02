@@ -102,4 +102,4 @@ if [ -d ~/.bashrc.d ]; then
 fi
 
 # export TERM for screens
-export TERM_SCREEN screen-${TERM#*-}
+export TERM_SCREEN=screen-${TERM#*-}

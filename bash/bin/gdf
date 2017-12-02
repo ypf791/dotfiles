@@ -1,0 +1,83 @@
+#!/bin/bash
+
+if [ "-w" = "$1" ]; then
+	mkdir -p $2
+	TMPDIR=${TMPDIR:-/tmp/}
+
+	if [ "${3:0:${#TMPDIR}}" = "$TMPDIR" ]; then
+		cp $3 $2/
+		echo -n "$2/`basename $3` "
+	else
+		echo -n "$3 "
+	fi
+
+	if [ "${4:0:${#TMPDIR}}" = "$TMPDIR" ]; then
+		cp $4 $2/
+		echo $2/`basename $4`
+	else
+		echo $4
+	fi
+
+	exit 0
+fi
+
+gitRoot=
+if ! gitRoot=`git rev-parse --git-dir`; then
+	exit $?
+fi
+gitRoot=`dirname $gitRoot`
+
+if [ 'Darwin' = `uname -s` ]; then
+	tempDir=`mktemp -ud -t ".gdf_XXXX"` || exit 1
+	temprc=`mktemp -u -t "vim.XXXX"` || exit 1
+else
+	tempDir=`mktemp -ud -p . -t ".gdf_XXXX"` || exit 1
+	temprc=`mktemp -u -p $tempDir -t "vim.XXXX"` || exit 1
+fi
+
+_exit() {
+	rm -rf "$gitRoot/$tempDir"
+	exit $1
+}
+
+echo "invoking git-difftool..."
+echo "force apply options --no-prompt --tool=vimdiff..."
+CMD="git difftool"
+APPENDING="-y -x \"`basename ${BASH_SOURCE[0]}` -w $tempDir $LOCAL $REMOTE 2>/dev/null\""
+while [ 0 -lt $# ]; do
+	if [ "--" != "$1" ]; then
+		CMD="$CMD \"$1\""
+	else
+		CMD="$CMD $APPENDING --"
+		APPENDING=""
+	fi
+	shift
+done
+CMD="$CMD $APPENDING"
+
+FILES=`eval "$CMD"`
+[ 0 -ne $? ] && exit $?
+
+# switch to Git repository root
+cd $gitRoot
+
+parse_vimrc() {
+	while [ $# -ge 2 ]; do
+		echo "au! BufEnter *" >> $temprc
+		echo "tabe $2" >> $temprc
+		echo "vert diffsplit $1" >> $temprc
+		shift 2
+	done
+}
+
+parse_vimrc $FILES
+
+if [ -s $temprc ]; then
+	echo "tabfirst" >> $temprc
+	echo "tabclose" >> $temprc
+	vim -S $temprc
+else
+	echo "No difference found !"
+fi
+
+_exit 0

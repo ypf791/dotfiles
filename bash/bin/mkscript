@@ -1,0 +1,57 @@
+#!/bin/bash
+
+ScriptPath=`dirname $(readlink -f $0)`
+
+_show_help() {
+	cat >&2 << EOF
+USAGE: `basename $0` [-h] [arguments...]
+OPTIONS
+	-h	show this message
+ARGUMENTS
+	list of script names to create
+EOF
+}
+
+OPTIND= OPTARG= opt=
+while getopts "h" opt; do
+	if [ "${OPTARG#-}" != "$OPTARG" ]; then
+		echo "$0: option requires an argument -- $opt" >&2
+		opt=?
+	fi
+	case $opt in
+	h)	_show_help; exit
+		;;
+	?)	_show_help; exit 1
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+_create() {
+	if [ -e "$1" ]; then
+		echo "[Error] $1 already exists!!" >&2
+		exit 1
+	fi
+
+	exec < `readlink -f $0`
+
+	lineno=0
+	while read; do
+		lineno=$((lineno+1))
+		if [ 11 -eq $lineno ]; then
+			echo "	(argument descriptions)" >> $1
+			continue
+		fi
+		if [ 29 -lt $lineno ]; then
+			break
+		fi
+		echo "$REPLY" >> $1
+	done
+	chmod +x $1
+}
+
+while [ 0 -lt $# ]; do
+	_create $1
+	shift
+done
