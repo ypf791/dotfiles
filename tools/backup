@@ -47,8 +47,9 @@ BKP_DIR=${1:-/tmp/.config_backup}
 mkdir -p "$BKP_DIR"
 
 for f in `cat $BKP_FILE_LIST`; do
-	if [ -f "$f" ]; then
-		install -v -m `stat -c %a -- $f` -D "`readlink -f $f`" "`readlink -f $BKP_DIR/$f`" && rm -f "$f"
+	if [ -e "$f" -a ! -e $BKP_DIR/$f ]; then
+		install -d -m 755 -D $BKP_DIR/${f%/*}
+		mv -vr $f $BKP_DIR/
 	fi
 done
 

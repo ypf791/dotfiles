@@ -54,7 +54,4 @@ for f in `cat $INSTALLED_FILE_LIST`; do
 done
 
 cd "$BKP_DIR"
-for f in `find . -type f`; do
-	install -v -m `stat -c %a -- $f` -D "`readlink -f $f`" "`readlink -f /$f`" && rm -f "$f"
-done
-
+tar cvf - | tar xvf - -C /
