@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd $1
-tar cvf - . | tar xvf - -C /
+tar cf - . | tar xvf - -C /

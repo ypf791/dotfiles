@@ -54,4 +54,4 @@ for f in `cat $INSTALLED_FILE_LIST`; do
 done
 
 cd "$BKP_DIR"
-tar cvf - | tar xvf - -C /
+tar cf - . | tar xvf - -C /

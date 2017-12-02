@@ -4,7 +4,7 @@ BUILDERS=all global local
 CHECKABLE=$(BUILDERS) install revert clean
 TARGETS=$(shell ls target.list)
 
-RT_FINDSRC=\`cd $(SRC_PATH); find -type f -o type l\`
+FINDSRCCMD=cd $(SRC_PATH); find -type f -o -type l
 
 .PHONY: first
 .PHONY: $(addprefix say.,$(BUILDERS))
@@ -54,13 +54,13 @@ pre.$(BKP_LIST):
 
 $(BKP_LIST): pre.$(BKP_LIST) $(MERGE_TOOL) $(TARGETS)
 	@echo "gathering backup list..."
-	@$(MERGE_TOOL) -o $@ -i "$(RT_FINDSRC)" -- $(addsuffix /$(BKP_LIST),$(TARGETS))
+	@$(MERGE_TOOL) -o $@ -i "`$(FINDSRCCMD)`" -- $(addsuffix /$(BKP_LIST),$(TARGETS))
 	@echo "<==== $(BKP_LIST) complete"
 
 $(INS_LIST): $(SRC_PATH)
 	@echo "====> $(INS_LIST)"
 	@echo "listing $(SRC_PATH)..."
-	@echo "$(RT_FINDSRC)" > $(INS_LIST)
+	@echo "`$(FINDSRCCMD)`" > $(INS_LIST)
 	@echo "<==== $(INS_LIST) complete"
 
 say.%:
