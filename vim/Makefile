@@ -8,9 +8,6 @@ PLUGINS= \
 	xterm-color-table
 PLUGINS_DIR=home/.vim/bundle
 
-INSTALL_F=install -v -m 644 -D
-INSTALL_D=install -d -m 755 -D
-
 .PHONY: first
 .PHONY: all global local clean
 .PHONY: $(addprefix say.,$(SPEAKERS))

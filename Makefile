@@ -18,7 +18,7 @@ pre.targets:
 
 $(TARGETS): pre.targets
 	@echo "======> $@"
-	@$(MAKE) -C `readlink -f target.list/$@` $(MAKECMDGOALS)
+	@make -C `readlink -f target.list/$@` $(MAKECMDGOALS)
 	@echo "<====== $@ complete"
 
 $(BUILDERS): %: check.% $(TARGETS)
