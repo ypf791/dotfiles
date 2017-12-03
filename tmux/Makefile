@@ -1,5 +1,5 @@
 CHECKABLE=
-SPEAKERS=
+SPEAKERS=local
 
 include ../Makefile.inc
 
@@ -8,15 +8,14 @@ include ../Makefile.inc
 
 first: all
 
-all:
-	@make global
-	@make local
+all: global local
 
 global:
-	@echo "default rule for $@; override to have your target build correctly"
 
-local:
-	@echo "default rule fo $@; override to have your target build correctly"
+local: say.local
+	@$(INSTALL_F) tmux.conf $(abspath $(SRC_PATH)/$(HOME)/.tmux.conf)
+	@$(INSTALL_D) $(SRC_PATH)/$(HOME)/.tmux/plugin/tpm
+	@$(INSTALL_TOOL) $(EXT_PROJ)/tpm $(SRC_PATH)/$(HOME)/.tmux/plugin/tpm
 
 clean:
 
