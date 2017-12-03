@@ -98,7 +98,9 @@ fi
 
 # User-defined scripts
 if [ -d ~/.bashrc.d ]; then
-	PATH=$PATH:~/.bashrc.d
+	if ! echo $PATH | grep -- "`readlink -f ~/.bashrc.d`" >/dev/null 2>&1; then
+		PATH=$PATH:~/.bashrc.d
+	fi
 fi
 
 # export TERM for screens
