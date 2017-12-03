@@ -1,7 +1,8 @@
-include ../Makefile.inc
-
 CHECKABLE=local
 SPEAKERS=global local
+
+include ../Makefile.inc
+
 PLUGINS= \
 	vim-sensible \
 	vim-fugitive \
@@ -11,8 +12,6 @@ PLUGINS_DIR=home/.vim/bundle
 
 .PHONY: first
 .PHONY: all global local clean
-.PHONY: $(addprefix say.,$(SPEAKERS))
-.PHONY: $(addprefix check.,$(CHECKABLE))
 .PHONY: pathogen $(PLUGINS)
 
 first: all
@@ -25,9 +24,8 @@ global: say.global
 	@$(INSTALL_F) vimrc.local $(abspath $(SRC_PATH)/etc/vim/vimrc.local)
 
 local: check.local $(PLUGINS)
-	@$(INSTALL_D) $(SRC_PATH)/$(HOME)/
 	@echo taking home/ on a trip...
-	@cd home; tar cf - . | tar xf - -C $(SRC_PATH)/$(HOME)/
+	@$(INSTALL_TOOL) home $(SRC_PATH)/$(HOME)/
 	@$(INSTALL_F) vimrc $(abspath $(SRC_PATH)/$(HOME)/.vimrc)
 	@if [ -f home/.vim/autoload/pathogen.vim ]; then \
 		echo '"enable pathogen' >> $(SRC_PATH)/$(HOME)/.vimrc; \

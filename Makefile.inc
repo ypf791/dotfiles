@@ -1,6 +1,9 @@
 ROOT=/
 HOME=$(shell ls -d ~/)
 
+.PHONY: $(addprefix say.,$(SPEAKERS))
+.PHONY: $(addprefix check.,$(CHECKABLE))
+
 PROJ_ROOT=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 EXT_PROJ=$(PROJ_ROOT)ext_proj
 SRC_PATH=$(PROJ_ROOT)_root

@@ -1,14 +1,15 @@
-include Makefile.inc
-
 BUILDERS=all global local
 CHECKABLE=$(BUILDERS) install revert clean
+SPEAKERS=$(BUILDERS)
+
+include Makefile.inc
+
 TARGETS=$(shell ls target.list)
 
 FINDSRCCMD=cd $(SRC_PATH); find -type f -o -type l
 
 .PHONY: first
-.PHONY: $(addprefix say.,$(BUILDERS))
-.PHONY: $(CHECKABLE) $(addprefix check.,$(CHECKABLE))
+.PHONY: $(CHECKABLE)
 .PHONY: pre.$(BKP_LIST) pre.targets $(TARGETS)
 
 first: all
@@ -31,7 +32,7 @@ install: check.install $(BACKUP_TOOL) $(INSTALL_TOOL)
 	@$(BACKUP_TOOL) -f $(BKP_LIST) -- $(BKP_PATH)
 	@rm -vf $(BKP_LIST)
 	@echo "invoking install tool..."
-	@$(INSTALL_TOOL) $(SRC_PATH)
+	@$(INSTALL_TOOL) $(SRC_PATH) /
 	@echo "<== make $@ complete!!"
 
 revert: check.revert $(REVERT_TOOL)
@@ -68,11 +69,11 @@ say.%:
 
 $(addprefix check.,$(BUILDERS)): check.%: say.%
 	@test ! -d $(SRC_PATH)
-	@install -d -m 755 -D $(SRC_PATH)
+	@$(INSTALL_D) $(SRC_PATH)
 
 check.install: say.install
 	@test -d $(SRC_PATH) -a ! -d $(BKP_PATH)
-	@install -d -m 755 -D $(BKP_PATH)
+	@$(INSTALL_D) $(BKP_PATH)
 
 check.revert: say.revert
 	@test -d $(SRC_PATH) -a -d $(BKP_PATH)

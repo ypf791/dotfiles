@@ -1,12 +1,10 @@
-include ../Makefile.inc
-
 CHECKABLE=
 SPEAKERS=
 
+include ../Makefile.inc
+
 .PHONY: first
 .PHONY: all global local clean
-.PHONY: $(addprefix say.,$(SPEAKERS))
-.PHONY: $(addprefix check.,$(CHECKABLE))
 
 first: all
 
