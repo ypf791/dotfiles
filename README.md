@@ -50,6 +50,7 @@ This project includes some brilliant projects. Listed below.
 * [vim-sensible](https://github.com/tpope/vim-sensible)
 * [vim-fugitive](https://github.com/tpope/vim-fugitive)
 * [xterm-color-table.vim](https://github.com/guns/xterm-color-table.vim)
+* [Taboo](https://github.com/gcmt/taboo.vim)
 
 `tmux`:
 * [tpm](https://github.com/tmux-plugins/tpm)

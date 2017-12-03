@@ -4,7 +4,6 @@ if [ "-w" = "$1" ]; then
 	TMPDIR=${TMPDIR:-/tmp/}
 	wrapDir=$2
 	params=$3
-	mkdir -p $2
 
 	shift 3
 	for i in 1 2; do
@@ -27,13 +26,15 @@ if ! gitRoot=`git rev-parse --git-dir`; then
 fi
 gitRoot=`dirname $gitRoot`
 
+cd $gitRoot
 if [ 'Darwin' = `uname -s` ]; then
-	tempDir=`mktemp -ud -t ".gdf_XXXX"` || exit 1
-	temprc=`mktemp -u -t "vim.XXXX"` || exit 1
+	tempDir=`mktemp -d -t ".gdf_XXXX"` || exit 1
+	temprc=`mktemp -t "vim.XXXX"` || exit 1
 else
-	tempDir=`mktemp -ud -p . -t ".gdf_XXXX"` || exit 1
-	temprc=`mktemp -u -p $tempDir -t "vim.XXXX"` || exit 1
+	tempDir=`mktemp -d -p . -t ".gdf_XXXX"` || exit 1
+	temprc=`mktemp -p $tempDir -t "vim.XXXX"` || exit 1
 fi
+cd -
 
 _exit() {
 	rm -rf "$gitRoot/$tempDir"
@@ -58,10 +59,10 @@ CMD="$CMD $APPENDING"
 FILES=`eval "$CMD"`
 [ 0 -ne $? ] && exit $?
 
-# switch to Git repository root
-cd $gitRoot
-
 parse_vimrc() {
+	if [ 0 -eq $# ]; then
+		return 1
+	fi
 	echo "au! BufEnter *" >> $temprc
 	while [ $# -ge 3 ]; do
 		echo "tabe $3" >> $temprc
@@ -71,6 +72,7 @@ parse_vimrc() {
 	done
 }
 
+cd $gitRoot
 parse_vimrc $FILES
 
 if [ -s $temprc ]; then
