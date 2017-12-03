@@ -20,7 +20,9 @@ local:
 	@$(INSTALL_F) home/bashrc $(abspath $(SRC_PATH)/$(HOME)/.bashrc)
 	@$(INSTALL_F) home/dircolors $(abspath $(SRC_PATH)/$(HOME)/.dircolors)
 	@$(INSTALL_F) home/bash_aliases $(abspath $(SRC_PATH)/$(HOME)/.bash_aliases)
-	@$(INSTALL_TOOL) home/bashrc.d $(SRC_PATH)/$(HOME)/.bashrc.d
+	@if [ -d home/bashrc.d ]; then \
+		$(INSTALL_TOOL) home/bashrc.d $(SRC_PATH)/$(HOME)/.bashrc.d; \
+	 fi
 
 clean:
 
