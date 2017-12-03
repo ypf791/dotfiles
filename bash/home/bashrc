@@ -103,3 +103,6 @@ fi
 
 # export TERM for screens
 export TERM_SCREEN=screen-${TERM#*-}
+
+# export locale for date format
+export LC_TIME=en_US.UTF-8

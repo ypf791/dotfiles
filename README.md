@@ -41,7 +41,7 @@ and backup those files in `backup.list` **AND** those existing in `_root` to `_b
 On the other hand, the default `make revert` removes all files addressed in `_root`, 
 and puts files in `_bkp` back to their original location.
 
-## Inclusion
+## Credits
 
 This project includes some brilliant projects. Listed below.
 
