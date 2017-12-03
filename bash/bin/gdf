@@ -9,8 +9,8 @@ if [ "-w" = "$1" ]; then
 	for i in 1 2; do
 		_1=$1
 		if [ "${1:0:${#TMPDIR}}" = "$TMPDIR" ]; then
-			cp $1 $wrapDir/
 			_1=$wrapDir/`basename $1`
+			ln $1 $_1
 		fi
 		params="$params $_1"
 		shift
@@ -43,6 +43,7 @@ _exit() {
 
 echo "invoking git-difftool..."
 echo "force apply options --no-prompt --tool=vimdiff..."
+
 CMD="git difftool"
 APPENDING="-y -x '`basename ${BASH_SOURCE[0]}` -w $tempDir \$BASE'"
 while [ 0 -lt $# ]; do
@@ -65,9 +66,13 @@ parse_vimrc() {
 	fi
 	echo "au! BufEnter *" >> $temprc
 	while [ $# -ge 3 ]; do
-		echo "tabe $3" >> $temprc
-		echo "vert diffsplit $2" >> $temprc
-		echo "TabooRename $1" >> $temprc
+		cat >>$temprc <<EOF
+tabe $3
+vert diffsplit $2
+if exists(":TabooRename")
+	TabooRename $1
+endif
+EOF
 		shift 3
 	done
 }
