@@ -1,0 +1,21 @@
+#!/bin/bash
+
+__sub_confs() {
+	# powerline.conf is not used yet
+	cat <<EOF
+status.conf
+binding.conf
+misc.conf
+plugins.conf
+_post.conf
+EOF
+}
+
+if [ "-l" = "$1" ]; then
+	__sub_confs
+	exit 0
+fi
+
+for conf in `__sub_confs`; do
+	cat $conf
+done
