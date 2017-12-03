@@ -1,23 +1,23 @@
 #!/bin/bash
 
 if [ "-w" = "$1" ]; then
-	mkdir -p $2
 	TMPDIR=${TMPDIR:-/tmp/}
+	wrapDir=$2
+	params=$3
+	mkdir -p $2
 
-	if [ "${3:0:${#TMPDIR}}" = "$TMPDIR" ]; then
-		cp $3 $2/
-		echo -n "$2/`basename $3` "
-	else
-		echo -n "$3 "
-	fi
+	shift 3
+	for i in 1 2; do
+		_1=$1
+		if [ "${1:0:${#TMPDIR}}" = "$TMPDIR" ]; then
+			cp $1 $wrapDir/
+			_1=$wrapDir/`basename $1`
+		fi
+		params="$params $_1"
+		shift
+	done
 
-	if [ "${4:0:${#TMPDIR}}" = "$TMPDIR" ]; then
-		cp $4 $2/
-		echo $2/`basename $4`
-	else
-		echo $4
-	fi
-
+	echo "$params"
 	exit 0
 fi
 
@@ -43,7 +43,7 @@ _exit() {
 echo "invoking git-difftool..."
 echo "force apply options --no-prompt --tool=vimdiff..."
 CMD="git difftool"
-APPENDING="-y -x \"`basename ${BASH_SOURCE[0]}` -w $tempDir $LOCAL $REMOTE 2>/dev/null\""
+APPENDING="-y -x '`basename ${BASH_SOURCE[0]}` -w $tempDir \$BASE'"
 while [ 0 -lt $# ]; do
 	if [ "--" != "$1" ]; then
 		CMD="$CMD \"$1\""
@@ -62,11 +62,12 @@ FILES=`eval "$CMD"`
 cd $gitRoot
 
 parse_vimrc() {
-	while [ $# -ge 2 ]; do
+	while [ $# -ge 3 ]; do
 		echo "au! BufEnter *" >> $temprc
-		echo "tabe $2" >> $temprc
-		echo "vert diffsplit $1" >> $temprc
-		shift 2
+		echo "tabe $3" >> $temprc
+		echo "vert diffsplit $2" >> $temprc
+		echo "TabooRename $1" >> $temprc
+		shift 3
 	done
 }
 

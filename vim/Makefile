@@ -5,7 +5,8 @@ SPEAKERS=global local
 PLUGINS= \
 	vim-sensible \
 	vim-fugitive \
-	xterm-color-table
+	xterm-color-table \
+	taboo
 PLUGINS_DIR=home/.vim/bundle
 
 .PHONY: first
