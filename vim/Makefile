@@ -23,11 +23,11 @@ global: say.global
 
 local: check.local $(PLUGINS)
 	@echo taking home/ on a trip...
-	@$(INSTALL_TOOL) home $(SRC_PATH)/$(HOME)/
-	@$(INSTALL_F) vimrc $(abspath $(SRC_PATH)/$(HOME)/.vimrc)
+	@$(INSTALL_TOOL) home $(SRC_HOME_PATH)/
+	@$(INSTALL_F) vimrc $(abspath $(SRC_HOME_PATH)/.vimrc)
 	@if [ -f home/.vim/autoload/pathogen.vim ]; then \
-		echo '"enable pathogen' >> $(SRC_PATH)/$(HOME)/.vimrc; \
-		echo 'execute pathogen#infect()' >> $(SRC_PATH)/$(HOME)/.vimrc; \
+		echo '"enable pathogen' >> $(SRC_HOME_PATH)/.vimrc; \
+		echo 'execute pathogen#infect()' >> $(SRC_HOME_PATH)/.vimrc; \
 	 fi
 
 clean:
@@ -50,7 +50,7 @@ $(BKP_LIST):
 	@touch $@
 
 say.%:
-	@echo "preparing $* files in $(notdir $(SRC_PATH))..."
+	@echo "preparing $* files..."
 
 check.local: say.local
 	@test ! -d home

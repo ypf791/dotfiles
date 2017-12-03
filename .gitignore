@@ -1,7 +1,10 @@
+ext_proj/
+
 _root/
 _bkp/
+
 */backup.list
 backup.list
-ext_proj/
+installed.list
 
 !.gitignore

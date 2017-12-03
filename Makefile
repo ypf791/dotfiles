@@ -1,12 +1,12 @@
 BUILDERS=all global local
 CHECKABLE=$(BUILDERS) install revert clean
-SPEAKERS=$(BUILDERS)
+SPEAKERS=$(CHECKABLE)
 
 include Makefile.inc
 
 TARGETS=$(shell ls target.list)
 
-FINDSRCCMD=cd $(SRC_PATH); find -type f -o -type l
+FIND_ROOT_CMD=cd $(SRC_PATH); find -type f -o -type l | sed 's/^\.//g'
 
 .PHONY: first
 .PHONY: $(CHECKABLE)
@@ -55,26 +55,31 @@ pre.$(BKP_LIST):
 
 $(BKP_LIST): pre.$(BKP_LIST) $(MERGE_TOOL) $(TARGETS)
 	@echo "gathering backup list..."
-	@$(MERGE_TOOL) -o $@ -i "`$(FINDSRCCMD)`" -- $(addsuffix /$(BKP_LIST),$(TARGETS))
+	@$(MERGE_TOOL) \
+		-o $@ \
+		-i "`$(FIND_ROOT_CMD)`" \
+		-- $(addsuffix /$(BKP_LIST),$(TARGETS))
 	@echo "<==== $(BKP_LIST) complete"
 
 $(INS_LIST): $(SRC_PATH)
 	@echo "====> $(INS_LIST)"
 	@echo "listing $(SRC_PATH)..."
-	@echo "`$(FINDSRCCMD)`" > $(INS_LIST)
+	@echo "`$(FIND_ROOT_CMD)`" > $(INS_LIST)
 	@echo "<==== $(INS_LIST) complete"
 
-say.%:
+$(addprefix say.,$(SPEAKERS)): say.%:
 	@echo "==> make $*"
 
-$(addprefix check.,$(BUILDERS)): check.%: say.%
-	@test ! -d $(SRC_PATH)
+$(addprefix check.,$(CHECKABLE)): check.%: say.%
+
+$(addprefix check.,$(BUILDERS)):
+	@test ! -e $(SRC_PATH)
 	@$(INSTALL_D) $(SRC_PATH)
 
-check.install: say.install
-	@test -d $(SRC_PATH) -a ! -d $(BKP_PATH)
+check.install:
+	@test -d $(SRC_PATH) -a ! -e $(BKP_PATH)
 	@$(INSTALL_D) $(BKP_PATH)
 
-check.revert: say.revert
+check.revert:
 	@test -d $(SRC_PATH) -a -d $(BKP_PATH)
 

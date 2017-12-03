@@ -37,14 +37,14 @@ if [ "$UseSSHKey" ]; then
 
 	# generate key if not exists
 	if [ ! -f ~/.ssh/$SSHKeyName ]; then
-		ssh-keygen -t rsa -f ~/.ssh/$SSHKeyName -P "echo -n $RANDOM | md5sum"
+		ssh-keygen -t rsa -f ~/.ssh/$SSHKeyName -P ""
 	else
 		echo "~/.ssh/$SSHKeyName already exists"
 	fi
 
 	# show public key for user to copy, registering it to their Git server
 	if [ -f ~/.ssh/$SSHKeyName ]; then
-		if xsel < ~/.ssh/$SSHKeyName.pub; then
+		if xsel -b < ~/.ssh/$SSHKeyName.pub; then
 			echo "the public key has been copied to your clipboard."
 			
 		else
@@ -68,7 +68,7 @@ fi
 Echo "dotfile project"
 
 cd
-git clone https://github.com/ypf791/dotfiles.git
+git clone git@github.com:ypf791/dotfiles.git
 
 Echo "dependent project"
 

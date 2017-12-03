@@ -50,8 +50,8 @@ if [ ! -d "$BKP_DIR" ]; then
 fi
 
 for f in `cat $INSTALLED_FILE_LIST`; do
-	rm -vf `readlink -f /$f`
+	rm -vf `readlink -f $f`
 done
 
 cd "$BKP_DIR"
-tar cf - . | tar xvf - -C /
+tar -cf - . | tar --no-overwrite-dir -xvf - -C /

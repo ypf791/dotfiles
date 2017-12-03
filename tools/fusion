@@ -23,7 +23,7 @@ while [ 0 -lt $# ]; do
 done
 
 for file in $INC_FILES; do
-	echo ${file#.} >> $BKP_LIST_TMP
+	echo $file >> $BKP_LIST_TMP
 done
 
 cat $BKP_LIST_TMP | sort -u > $BKP_LIST

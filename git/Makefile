@@ -24,4 +24,4 @@ $(BKP_LIST):
 	@touch $@
 
 say.%:
-	@echo "preparing $* files in $(notdir $(SRC_PATH))..."
+	@echo "preparing $* files..."
