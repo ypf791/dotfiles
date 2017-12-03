@@ -72,11 +72,5 @@ git clone https://github.com/ypf791/dotfiles.git
 
 Echo "dependent project"
 
-mkdir -p dotfiles/ext_proj; cd dotfiles/ext_proj
-for proj in `cat ../prepare.ext.list`; do
-	proj_name=${proj##*/}
-	proj_name=${proj_name##*:}
-	proj_path=https://${proj%:*}.git
-	[ -e "$proj_name" ] && echo "$proj_name already exists" || git clone $proj_path $proj_name
-done
-cd ..
+cd dotfiles
+./prepare.ext

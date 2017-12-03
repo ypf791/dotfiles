@@ -62,8 +62,8 @@ FILES=`eval "$CMD"`
 cd $gitRoot
 
 parse_vimrc() {
+	echo "au! BufEnter *" >> $temprc
 	while [ $# -ge 3 ]; do
-		echo "au! BufEnter *" >> $temprc
 		echo "tabe $3" >> $temprc
 		echo "vert diffsplit $2" >> $temprc
 		echo "TabooRename $1" >> $temprc
