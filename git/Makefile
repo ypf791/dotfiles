@@ -9,14 +9,13 @@ include ../Makefile.inc
 first: all
 
 all:
-	@make global
-	@make local
 
 global:
-	@echo "default rule for $@; override to have your target build correctly"
+	@$(INSTALL_F) gitconfig.system $(abspath $(SRC_PATH)/etc/gitconfig)
 
 local:
-	@echo "default rule fo $@; override to have your target build correctly"
+	@$(INSTALL_F) gitconfig.user $(abspath $(SRC_HOME_PATH)/.gitconfig)
+	@cat gitconfig.global >> $(SRC_HOME_PATH)/.gitconfig
 
 clean:
 

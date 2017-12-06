@@ -1,9 +1,3 @@
-[user]
-	name = ypf791
-	email = ypf791@gmail.com
-[core]
-	filemode = true
-	editor = vim
 [alias]
 	st = status
 	com = commit
@@ -14,11 +8,3 @@
 	la = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	ll = log --graph --decorate --pretty=oneline --abbrev-commit
 	lf = log --stat --decorate --format=fuller abbrev-commit
-[color]
-	ui = auto
-	diff = auto
-	status = auto
-	branch = auto
-	log = auto
-[push]
-	default = simple
