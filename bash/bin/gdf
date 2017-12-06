@@ -1,7 +1,8 @@
 #!/bin/bash
 
+TMPDIR=${TMPDIR:-/tmp/}
+
 if [ "-w" = "$1" ]; then
-	TMPDIR=${TMPDIR:-/tmp/}
 	wrapDir=$2
 	params=$3
 
@@ -31,10 +32,10 @@ if [ 'Darwin' = `uname -s` ]; then
 	tempDir=`mktemp -d -t ".gdf_XXXX"` || exit 1
 	temprc=`mktemp -t "vim.XXXX"` || exit 1
 else
-	tempDir=`mktemp -d -p . -t ".gdf_XXXX"` || exit 1
+	tempDir=`mktemp -d -p $TMPDIR -t "gdf_XXXX"` || exit 1
 	temprc=`mktemp -p $tempDir -t "vim.XXXX"` || exit 1
 fi
-cd -
+cd - >/dev/null
 
 _exit() {
 	rm -rf "$gitRoot/$tempDir"
