@@ -8,7 +8,7 @@ include ../Makefile.inc
 
 first: all
 
-all:
+all: global local
 
 global:
 	@$(INSTALL_F) gitconfig.system $(abspath $(SRC_PATH)/etc/gitconfig)

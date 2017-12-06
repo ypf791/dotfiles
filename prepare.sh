@@ -1,7 +1,28 @@
 #!/bin/bash
 
-UseSSHKey=on
-SSHKeyName=id_rsa
+_show_help() {
+	cat >&2 << EOF
+USAGE: `basename $0` [-h] [-k]
+OPTIONS
+	-h	show this message
+	-k	confirm to generate ssh-key ~/.ssh/id_rsa[.pub] with empty phrase
+EOF
+}
+
+UseSSHKey=
+OPTIND= OPTARG= opt=
+while getopts "hk" opt; do
+	case $opt in
+	h)	_show_help; exit
+		;;
+	k)	UseSSHKey=on
+		;;
+	?)	_show_help; exit 1
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
 
 Echo() {
 	echo; echo "===== $@ ====="
@@ -36,20 +57,20 @@ if [ "$UseSSHKey" ]; then
 	Echo "ssh key"
 
 	# generate key if not exists
-	if [ ! -f ~/.ssh/$SSHKeyName ]; then
-		ssh-keygen -t rsa -f ~/.ssh/$SSHKeyName -P ""
+	if [ ! -f ~/.ssh/id_rsa ]; then
+		ssh-keygen -t rsa -f ~/.ssh/id_rsa -P ""
 	else
-		echo "~/.ssh/$SSHKeyName already exists"
+		echo "~/.ssh/id_rsa already exists"
 	fi
 
 	# show public key for user to copy, registering it to their Git server
-	if [ -f ~/.ssh/$SSHKeyName ]; then
-		if xsel -b < ~/.ssh/$SSHKeyName.pub; then
+	if [ -f ~/.ssh/id_rsa ]; then
+		if xsel -b < ~/.ssh/id_rsa.pub; then
 			echo "the public key has been copied to your clipboard."
 			
 		else
 			echo
-			cat ~/.ssh/$SSHKeyName.pub;
+			cat ~/.ssh/id_rsa.pub;
 			echo
 			echo "please copy the public key above, and"
 		fi
@@ -70,7 +91,11 @@ Echo "dotfile project"
 ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
 cd
-git clone git@github.com:ypf791/dotfiles.git
+if [ -z "$UseSSHKey" ]; then
+	git clone https://github.com/ypf791/dotfiles.git
+else
+	git clone git@github.com:ypf791/dotfiles.git
+fi
 
 Echo "dependent project"
 
