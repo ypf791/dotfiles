@@ -1,15 +1,14 @@
 [user]
-	name = yenchunc
-	email = yenchunc@synology.com
+	name = ypf791
+	email = ypf791@gmail.com
 [core]
 	filemode = true
 	editor = vim
 [alias]
 	st = status
-	ci = commit
-	co = checkout
+	com = commit
+	ch = checkout
 	br = branch
-	df = diff
 	pick = cherry-pick
 	fp = format-patch
 	la = log --graph --decorate --pretty=oneline --abbrev-commit --all
@@ -23,7 +22,3 @@
 	log = auto
 [push]
 	default = simple
-[diff]
-	tool = vimdiff
-[difftool]
-	prompt = false
