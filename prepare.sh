@@ -67,6 +67,8 @@ fi
 
 Echo "dotfile project"
 
+ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
 cd
 git clone git@github.com:ypf791/dotfiles.git
 
