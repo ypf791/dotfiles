@@ -8,15 +8,13 @@ include ../Makefile.inc
 
 first: all
 
-all:
-	@make global
-	@make local
+all: global local
 
-global:
+global: say.global
 	@$(INSTALL_F) bash.bashrc $(abspath $(SRC_PATH)/etc/bash.bashrc)
 	@$(INSTALL_TOOL) bin $(SRC_PATH)/usr/local/bin/
 
-local:
+local: say.local
 	@$(INSTALL_F) home/bashrc $(abspath $(SRC_HOME_PATH)/.bashrc)
 	@$(INSTALL_F) home/dircolors $(abspath $(SRC_HOME_PATH)/.dircolors)
 	@$(INSTALL_F) home/bash_aliases $(abspath $(SRC_HOME_PATH)/.bash_aliases)

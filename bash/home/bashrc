@@ -98,9 +98,9 @@ fi
 
 # User-defined scripts
 if [ -d ~/.bashrc.d ]; then
-	if ! echo $PATH | grep -- "`readlink -f ~/.bashrc.d`" >/dev/null 2>&1; then
-		PATH=$PATH:~/.bashrc.d
-	fi
+	for f in `ls ~/.bashrc.d`; do
+		[ -r "~/.bashrc.d/$f" ] && . ~/.bashrc.d/$f
+	done
 fi
 
 # export locale for date format
