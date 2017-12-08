@@ -99,7 +99,7 @@ fi
 # User-defined scripts
 if [ -d ~/.bashrc.d ]; then
 	for f in `ls ~/.bashrc.d`; do
-		[ -r "~/.bashrc.d/$f" ] && . ~/.bashrc.d/$f
+		[ -r ~/.bashrc.d/$f ] && . ~/.bashrc.d/$f
 	done
 fi
 

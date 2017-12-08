@@ -51,7 +51,8 @@ apt install -y git openssh-server telnetd nfs-kernel-server samba cifs-utils sys
 Echo "install convenient packages"
 
 # install good things
-apt install -y ctags tmux silversearcher-ag jq xsel rake
+# id-utils for gj, a vim's plugin
+apt install -y ctags tmux silversearcher-ag jq xsel rake id-utils
 
 if [ "$UseSSHKey" ]; then
 	Echo "ssh key"

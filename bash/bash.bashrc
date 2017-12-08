@@ -53,3 +53,15 @@ if [ -x /usr/lib/command-not-found -o -x /usr/share/command-not-found/command-no
 		fi
 	}
 fi
+
+# one may need to add customized path in PATH
+# need to support globally
+_oo_addpath() {
+	while [ 0 -lt $# ]; do
+		path=`readlink -f $1`
+		if ! echo $PATH | grep -- "$path" >/dev/null 2>&1; then
+			PATH=$PATH:$path
+		fi
+		shift
+	done
+}

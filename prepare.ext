@@ -6,12 +6,13 @@ __ext_projs() {
 	# 	<foldername> is the name under ext_proj/
 	# 	if not given, use <project>
 	cat <<EOF
-github.com/tpope/vim-pathogen
-github.com/tpope/vim-sensible
-github.com/tpope/vim-fugitive
-github.com/guns/xterm-color-table.vim:xterm-color-table
-github.com/gcmt/taboo.vim:taboo
-github.com/tmux-plugins/tpm
+tpope/vim-pathogen
+tpope/vim-sensible
+tpope/vim-fugitive
+guns/xterm-color-table.vim:xterm-color-table
+gcmt/taboo.vim:taboo
+tmux-plugins/tpm
+fcamel/gj
 EOF
 }
 
@@ -22,7 +23,7 @@ cd ext_proj
 for proj in $EXT_PROJS; do
 	proj_name=${proj##*/}
 	proj_name=${proj_name##*:}
-	proj_path=https://${proj%:*}.git
+	proj_path=https://github.com/${proj%:*}.git
 	if [ -e "$proj_name" ]; then
 		echo "$proj_name already exists"
 	else
