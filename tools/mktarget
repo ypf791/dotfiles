@@ -5,7 +5,7 @@ TemplatePath=$ScriptPath/templates
 
 _show_help() {
 	cat >&2 << EOF
-USAGE: create_target [-h] <target...>
+USAGE: `basename $0` [-h] <target...>
 OPTIONS
 	-h	show this message
 ARGUMENTS
@@ -21,7 +21,7 @@ _mktarget() {
 		rtn=1
 	fi
 	echo "Cloning template Makefile..."
-	if ! cp $TemplatePath/target.mak $CreatePath/$1/Makefile; then
+	if ! install -m 644 -D $TemplatePath/target.mak $CreatePath/$1/Makefile; then
 		echo "[Error] _mktarget: failed to create Makefile!!" >&2
 		rtn=2
 	fi
@@ -33,7 +33,7 @@ _mktarget() {
 	echo "Linking to target.list..."
 	if [ 0 -eq $rtn ]; then
 		cd $ScriptPath/../target.list
-		ln -s $CreatePath/$1
+		ln -s ../$1
 	fi
 	echo "<=== generate $1 done [$rtn]"
 	return $rtn

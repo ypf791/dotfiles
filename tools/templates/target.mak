@@ -8,9 +8,7 @@ include ../Makefile.inc
 
 first: all
 
-all:
-	@make global
-	@make local
+all: global local
 
 global:
 	@echo "default rule for $@; override to have your target build correctly"
