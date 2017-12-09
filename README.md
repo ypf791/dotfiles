@@ -53,7 +53,7 @@ and backup those files in `<target>/backup.list` **AND** those existing in `_roo
 On the other hand, the default `make revert` removes all files addressed in `_root`, 
 and puts files in `_bkp` back to their original location.
 
-### `global` and `local`
+### Global and Local
 
 In addition to `make all`, 
 one may only want to deploy global settings (under `/`) or local settings (under `~`).
