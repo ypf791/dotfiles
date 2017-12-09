@@ -98,7 +98,3 @@ else
 	git clone git@github.com:ypf791/dotfiles.git
 fi
 
-Echo "dependent project"
-
-cd dotfiles
-./prepare.ext
