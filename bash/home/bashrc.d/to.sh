@@ -7,7 +7,7 @@ to() {
 	OPTIND= OPTARG= opt=
 	while getopts "h" opt; do
 		if [ "${OPTARG#-}" != "$OPTARG" ]; then
-			echo "$0: option requires an argument -- $opt" >&2
+			echo "to: option requires an argument -- $opt" >&2
 			opt=?
 		fi
 		case $opt in
@@ -23,7 +23,7 @@ to() {
 
 	if [ -n "$isShowHelp" ]; then
 		cat >&2 << EOF
-USAGE: `basename $0` [-h] <back pattern>
+USAGE: to [-h] <back pattern>
 OPTIONS
 	-h	show this message
 ARGUMENTS
@@ -33,7 +33,7 @@ EOF
 	fi
 
 	if [ -z "$1" ]; then
-		echo "$0: global: must specify back pattern" >&2
+		echo "to: must specify back pattern" >&2
 		return 1
 	fi
 
@@ -49,7 +49,7 @@ EOF
 		fi
 	done
 
-	echo "not available back pattern!!" >&2
+	echo "to: not available back pattern" >&2
 	return 2
 }
 
