@@ -91,7 +91,6 @@ Echo "dotfile project"
 
 ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
-cd
 if [ -z "$UseSSHKey" ]; then
 	git clone https://github.com/ypf791/dotfiles.git
 else
