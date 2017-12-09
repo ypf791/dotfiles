@@ -29,12 +29,12 @@ make revert
   | _root | -------------> | _root |
   |       | <------------- | _bkp  |
   +-------+  make revert   +-------+
-     ^|                       |
-make || --- make              |
-     |v       clean           |
-   +----+          \          |
-   |    | <-------------------+
-   +----+
+     ^ |                       |
+make | | --- make              |
+     | v       clean           |
+   +-----+          \          |
+   |     | <-------------------+
+   +-----+
 ```
 
 ## For Development
@@ -65,12 +65,15 @@ replacing `make` with `make local` does the trick.
 
 This project includes some brilliant projects. Listed below.
 
+`gj`:
+* [gj](https://github.com/fcamel/gj)
+
 `vim`:
 * [vim-pathogen](https://github.com/tpope/vim-pathogen)
 * [vim-sensible](https://github.com/tpope/vim-sensible)
 * [vim-fugitive](https://github.com/tpope/vim-fugitive)
 * [xterm-color-table.vim](https://github.com/guns/xterm-color-table.vim)
-* [NERDTree] (https://github.com/scrooloose/nerdtree)
+* [NERDTree](https://github.com/scrooloose/nerdtree)
 * [Taboo](https://github.com/gcmt/taboo.vim)
 
 `tmux`:
