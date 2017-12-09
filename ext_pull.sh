@@ -1,7 +1,7 @@
 #!/bin/bash
 
 __ext_projs() {
-	# FORMAT: <hostname>/<author>/<project>[:folername]
+	# FORMAT: <hostname>/<author>/<project>[:foldername]
 	# DESCRIPTION
 	# 	<foldername> is the name under ext_proj/
 	# 	if not given, use <project>
@@ -10,17 +10,16 @@ tpope/vim-pathogen
 tpope/vim-sensible
 tpope/vim-fugitive
 guns/xterm-color-table.vim:xterm-color-table
+scrooloose/nerdtree:NERDTree
 gcmt/taboo.vim:taboo
 tmux-plugins/tpm
 fcamel/gj
 EOF
 }
 
-EXT_PROJS=`__ext_projs`
-
 mkdir -p ext_proj
 cd ext_proj
-for proj in $EXT_PROJS; do
+for proj in `__ext_projs`; do
 	proj_name=${proj##*/}
 	proj_name=${proj_name##*:}
 	proj_path=https://github.com/${proj%:*}.git

@@ -15,6 +15,8 @@ FIND_ROOT_CMD=cd $(SRC_PATH); find -type f -o -type l | sed 's/^\.//g'
 first: all
 
 pre.targets:
+	@echo "first prepare external projects..."
+	@./ext_pull.sh
 	@echo "find targets: $(TARGETS)"
 
 $(TARGETS): pre.targets

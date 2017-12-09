@@ -7,6 +7,7 @@ PLUGINS= \
 	vim-sensible \
 	vim-fugitive \
 	xterm-color-table \
+	NERDTree \
 	taboo
 PLUGINS_DIR=home/.vim/bundle
 
@@ -25,10 +26,6 @@ local: check.local $(PLUGINS)
 	@echo taking home/ on a trip...
 	@$(INSTALL_TOOL) home $(SRC_HOME_PATH)/
 	@$(INSTALL_F) vimrc $(abspath $(SRC_HOME_PATH)/.vimrc)
-	@if [ -f home/.vim/autoload/pathogen.vim ]; then \
-		echo '"enable pathogen' >> $(SRC_HOME_PATH)/.vimrc; \
-		echo 'execute pathogen#infect()' >> $(SRC_HOME_PATH)/.vimrc; \
-	 fi
 
 clean:
 	@rm -vrf home
@@ -40,9 +37,10 @@ pathogen:
 	 fi
 
 $(PLUGINS): pathogen
-	@$(INSTALL_TOOL) $(EXT_PROJ)/$@/plugin $(PLUGINS_DIR)/$@/plugin
-	@if [ -d $(EXT_PROJ)/$@/doc ]; then \
-		$(INSTALL_TOOL) $(EXT_PROJ)/$@/doc $(PLUGINS_DIR)/$@/doc; \
+	@for dir in `ls -d $(EXT_PROJ)/$@/*/`; do \
+		$(INSTALL_TOOL) $${dir} $(PLUGINS_DIR)/$@/`basename $${dir}`; \
+	 done
+	@if [ -d $(PLUGINS_DIR)/$@/doc ]; then \
 		vim -u NONE -c "helptags $(PLUGINS_DIR)/$@/doc" -c q; \
 	 fi
 

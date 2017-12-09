@@ -5,3 +5,14 @@ set autoindent
 set mouse=n
 set ttymouse=xterm2
 
+""" customize @plugin NERDTree
+map <C-n> :NERDTreeToggle<CR>
+let g:NERDTreeDirArrowExpandable = '+'
+let g:NERDTreeDirArrowCollapsible = '-'
+autocmd BufEnter *
+\	if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree())
+\	|	q
+\	|endif
+
+""" enable pathogen
+execute pathogen#infect()
