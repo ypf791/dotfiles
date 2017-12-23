@@ -42,9 +42,6 @@ _exit() {
 	exit $1
 }
 
-echo "invoking git-difftool..."
-echo "force apply options --no-prompt --tool=vimdiff..."
-
 CMD="git difftool"
 APPENDING="-y -x '`basename ${BASH_SOURCE[0]}` -w $tempDir \$BASE'"
 while [ 0 -lt $# ]; do
@@ -86,7 +83,7 @@ if [ -s $temprc ]; then
 	echo "tabclose" >> $temprc
 	vim -S $temprc
 else
-	echo "No difference found !"
+	echo "No difference found !" >&2
 fi
 
 _exit 0

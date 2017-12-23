@@ -1,4 +1,5 @@
 [alias]
+	aa = add --all
 	st = status
 	com = commit
 	ch = checkout
