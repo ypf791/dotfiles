@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TMPDIR=${TMPDIR:-/tmp/}
+tmpDirDef=${tmpDirDef:-/tmp/}
 
 if [ "-w" = "$1" ]; then
 	wrapDir=$2
@@ -9,7 +9,7 @@ if [ "-w" = "$1" ]; then
 	shift 3
 	for i in 1 2; do
 		_1=$1
-		if [ "${1:0:${#TMPDIR}}" = "$TMPDIR" ]; then
+		if [ "${1:0:${#tmpDirDef}}" = "$tmpDirDef" ]; then
 			_1=$wrapDir/`basename $1`
 			ln $1 $_1
 		fi
@@ -30,58 +30,72 @@ gitRoot=`dirname $gitRoot`
 cd $gitRoot
 if [ 'Darwin' = `uname -s` ]; then
 	tempDir=`mktemp -d -t ".gdf_XXXX"` || exit 1
-	temprc=`mktemp -t "vim.XXXX"` || exit 1
+	tempRc=`mktemp -t "vim.XXXX"` || exit 1
 else
-	tempDir=`mktemp -d -p $TMPDIR -t "gdf_XXXX"` || exit 1
-	temprc=`mktemp -p $tempDir -t "vim.XXXX"` || exit 1
+	tempDir=`mktemp -d -p $tmpDirDef -t "gdf_XXXX"` || exit 1
+	tempRc=`mktemp -p $tempDir -t "vim.XXXX"` || exit 1
 fi
 cd - >/dev/null
 
 _exit() {
-	rm -rf "$gitRoot/$tempDir"
+	rm -rf "$tempDir"
 	exit $1
 }
 
-CMD="git difftool"
-APPENDING="-y -x '`basename ${BASH_SOURCE[0]}` -w $tempDir \$BASE'"
+if [ -n "$verbose" ]; then
+	echo "invoking git-difftool..."
+	echo "force apply options --no-prompt --tool=vimdiff..."
+fi
+
+gdfCmd="git difftool"
+appendCmd="-y -x '`basename ${BASH_SOURCE[0]}` -w $tempDir \$BASE'"
 while [ 0 -lt $# ]; do
 	if [ "--" != "$1" ]; then
-		CMD="$CMD \"$1\""
+		gdfCmd="$gdfCmd \"$1\""
 	else
-		CMD="$CMD $APPENDING --"
-		APPENDING=""
+		gdfCmd="$gdfCmd $appendCmd --"
+		appendCmd=""
 	fi
 	shift
 done
-CMD="$CMD $APPENDING"
+gdfCmd="$gdfCmd $appendCmd"
 
-FILES=`eval "$CMD"`
 [ 0 -ne $? ] && exit $?
+
+deleted_files="$tempDir/.deleted_files"
 
 parse_vimrc() {
 	if [ 0 -eq $# ]; then
 		return 1
 	fi
-	echo "au! BufEnter *" >> $temprc
+	echo "au! BufEnter *" >> $tempRc
 	while [ $# -ge 3 ]; do
-		cat >>$temprc <<EOF
+		if [ "/dev/null" = "$3" ]; then
+			echo "$1" >> $deleted_files
+		else
+			cat >>$tempRc <<EOF
 tabe $3
 vert diffsplit $2
 if exists(":TabooRename")
 	TabooRename $1
 endif
 EOF
+		fi
 		shift 3
 	done
 }
 
 cd $gitRoot
-parse_vimrc $FILES
+parse_vimrc `eval "$gdfCmd"`
 
-if [ -s $temprc ]; then
-	echo "tabfirst" >> $temprc
-	echo "tabclose" >> $temprc
-	vim -S $temprc
+if [ -s $tempRc ]; then
+	echo "tabfirst" >> $tempRc
+	if [ -s $deleted_files ]; then
+		echo "e $deleted_files" >> $tempRc
+	else
+		echo "tabclose" >> $tempRc
+	fi
+	vim -S $tempRc
 else
 	echo "No difference found !" >&2
 fi
