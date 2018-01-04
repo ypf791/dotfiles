@@ -77,6 +77,7 @@ $(addprefix check.,$(CHECKABLE)): check.%: say.%
 $(addprefix check.,$(BUILDERS)):
 	@test ! -e $(SRC_PATH)
 	@$(INSTALL_D) $(SRC_PATH)
+	@$(INSTALL_D) $(SRC_HOME_PATH)
 
 check.install:
 	@test -d $(SRC_PATH) -a ! -e $(BKP_PATH)

@@ -23,6 +23,7 @@ first: all
 all: global local
 
 global: say.global
+	@$(INSTALL_D) $(SRC_PATH)/etc/vim
 	@$(INSTALL_F) vimrc.local $(abspath $(SRC_PATH)/etc/vim/vimrc.local)
 
 local: check.local $(PLUGINS) $(COLORSCHEMES)
@@ -36,6 +37,7 @@ clean:
 pathogen:
 	@$(INSTALL_D) home/.vim/bundle
 	@if [ ! -f home/.vim/autoload/$@.vim ]; then \
+		$(INSTALL_D) home/.vim/autoload; \
 		$(INSTALL_F) $(EXT_PROJ)/vim-$@/autoload/$@.vim home/.vim/autoload/$@.vim; \
 	 fi
 

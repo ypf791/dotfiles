@@ -16,6 +16,7 @@ local: say.local
 	@for dir in plugin doc bin; do \
 		$(INSTALL_TOOL) $(EXT_PROJ)/gj/$$dir $(SRC_HOME_PATH)/.vim/bundle/gj/$$dir; \
 	 done
+	@$(INSTALL_D) $(SRC_HOME_PATH)/.bashrc.d
 	@$(INSTALL_F) custom_path.sh $(SRC_HOME_PATH)/.bashrc.d/custom_path.sh
 
 clean:

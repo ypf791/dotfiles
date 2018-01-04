@@ -48,7 +48,7 @@ mkdir -p "$BKP_DIR"
 
 for f in `cat $BKP_FILE_LIST`; do
 	if [ -e "$f" -a ! -e $BKP_DIR/$f ]; then
-		install -d -m 755 -D $BKP_DIR/${f%/*}
+		install -d -m 755 $BKP_DIR/${f%/*}
 		mv -v $f $BKP_DIR/$f
 	fi
 done

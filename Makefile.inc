@@ -10,8 +10,8 @@ SRC_PATH=$(PROJ_ROOT)_root
 SRC_HOME_PATH=$(PROJ_ROOT)_root$(HOME)
 BKP_PATH=$(PROJ_ROOT)_bkp
 
-INSTALL_F=install -v -m 644 -D
-INSTALL_D=install -d -m 755 -D
+INSTALL_F=install -v -m 644
+INSTALL_D=install -d -m 755
 
 INSTALL_TOOL=$(PROJ_ROOT)tools/install
 REVERT_TOOL=$(PROJ_ROOT)tools/revert

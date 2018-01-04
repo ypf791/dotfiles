@@ -11,6 +11,7 @@ first: all
 all: global local
 
 global: say.global
+	@$(INSTALL_D) $(SRC_PATH)/etc
 	@$(INSTALL_F) bash.bashrc $(abspath $(SRC_PATH)/etc/bash.bashrc)
 	@$(INSTALL_TOOL) bin $(SRC_PATH)/usr/local/bin/
 
