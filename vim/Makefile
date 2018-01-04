@@ -3,6 +3,9 @@ SPEAKERS=global local
 
 include ../Makefile.inc
 
+COLORSCHEMES= \
+	molokai
+
 PLUGINS= \
 	vim-sensible \
 	vim-fugitive \
@@ -22,7 +25,7 @@ all: global local
 global: say.global
 	@$(INSTALL_F) vimrc.local $(abspath $(SRC_PATH)/etc/vim/vimrc.local)
 
-local: check.local $(PLUGINS)
+local: check.local $(PLUGINS) $(COLORSCHEMES)
 	@echo taking home/ on a trip...
 	@$(INSTALL_TOOL) home $(SRC_HOME_PATH)/
 	@$(INSTALL_F) vimrc $(abspath $(SRC_HOME_PATH)/.vimrc)
@@ -43,6 +46,9 @@ $(PLUGINS): pathogen
 	@if [ -d $(PLUGINS_DIR)/$@/doc ]; then \
 		vim -u NONE -c "helptags $(PLUGINS_DIR)/$@/doc" -c q; \
 	 fi
+
+$(COLORSCHEMES):
+	@$(INSTALL_TOOL) $(EXT_PROJ)/$@/colors home/.vim/colors
 
 $(BKP_LIST):
 	@touch $@
