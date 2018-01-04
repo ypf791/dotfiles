@@ -46,13 +46,32 @@ apt -y upgrade
 Echo "install necessary packages"
 
 # install necessary things
-apt install -y git openssh-server telnetd nfs-kernel-server samba cifs-utils system-config-samba python python3 vim apache2
+apt install -y          \
+	git                 \
+	openssh-server      \
+	telnetd             \
+	nfs-kernel-server   \
+	samba               \
+	cifs-utils          \
+	system-config-samba \
+	python              \
+	python3             \
+	vim                 \
+	apache2
 
 Echo "install convenient packages"
 
 # install good things
 # id-utils for gj, a vim's plugin
-apt install -y ctags tmux silversearcher-ag jq xsel rake id-utils
+apt install -y          \
+	ctags               \
+	tmux                \
+	silversearcher-ag   \
+	jq                  \
+	xsel                \
+	rake                \
+	id-utils            \
+	tree
 
 if [ "$UseSSHKey" ]; then
 	Echo "ssh key"
