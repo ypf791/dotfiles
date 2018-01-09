@@ -16,6 +16,7 @@ global: say.global
 	@$(INSTALL_TOOL) bin $(SRC_PATH)/usr/local/bin/
 
 local: say.local
+	@$(INSTALL_F) home/profile $(abspath $(SRC_HOME_PATH)/.profile)
 	@$(INSTALL_F) home/bashrc $(abspath $(SRC_HOME_PATH)/.bashrc)
 	@$(INSTALL_F) home/dircolors $(abspath $(SRC_HOME_PATH)/.dircolors)
 	@$(INSTALL_F) home/bash_aliases $(abspath $(SRC_HOME_PATH)/.bash_aliases)

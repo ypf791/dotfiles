@@ -6,7 +6,7 @@ include Makefile.inc
 
 TARGETS=$(shell ls target.list)
 
-FIND_ROOT_CMD=cd $(SRC_PATH); find -type f -o -type l | sed 's/^\.//g'
+FIND_ROOT_CMD=cd $(SRC_PATH); find . -type f -o -type l | sed 's/^\.//g'
 
 .PHONY: first
 .PHONY: $(CHECKABLE)
