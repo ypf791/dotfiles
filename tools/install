@@ -1,10 +1,11 @@
 #!/bin/bash
 
-if [ -e $2 -a ! -d $2 ]; then
+SRC="$1" DST="$2"
+
+if [ -e $DST -a ! -d $DST ]; then
 	exit 1
 fi
 
-install -d -m 755 $2
-DST=`readlink -f $2`
-cd $1
+install -d -m 755 $DST
+cd $SRC
 tar -cf - . | tar --no-overwrite-dir -xvf - -C $DST

@@ -58,7 +58,7 @@ fi
 # need to support globally
 _oo_addpath() {
 	while [ 0 -lt $# ]; do
-		path=`readlink -f $1`
+		path=`unset CDPATH && cd "$(dirname "$1")" && pwd -P`
 		if ! echo $PATH | grep -- "$path" >/dev/null 2>&1; then
 			PATH=$PATH:$path
 		fi
