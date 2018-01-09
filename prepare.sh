@@ -28,6 +28,8 @@ Echo() {
 	echo; echo "===== $@ ====="
 }
 
+InstallPkgs="/tmp/install_pkgs.sh"
+
 install_pkgs_brew() {
 }
 
@@ -37,6 +39,9 @@ install_pkgs_yum() {
 }
 
 install_pkgs_apt() {
+	wget https://raw.githubusercontent.com/ypf791/dotfiles/master/prepare_pkgs/apt.sh -O "$InstallPkgs"
+	sh "$InstallPkgs"
+	rm "$InstallPkgs"
 }
 
 case `uname -s` in
