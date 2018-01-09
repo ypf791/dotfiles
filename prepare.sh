@@ -31,6 +31,7 @@ Echo() {
 InstallPkgs="/tmp/install_pkgs.sh"
 
 install_pkgs_brew() {
+	# TODO
 }
 
 install_pkgs_yum() {
@@ -46,7 +47,9 @@ install_pkgs_apt() {
 
 case `uname -s` in
 Darwin)
-	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	if ! command -v brew >/dev/null; then
+		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	fi
 	install_pkgs_brew
 	;;
 Linux)
