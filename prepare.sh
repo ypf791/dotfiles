@@ -2,7 +2,7 @@
 
 _show_help() {
 	cat >&2 << EOF
-USAGE: `basename $0` [-h] [-k]
+USAGE: `basename ${BASH_SOURCE[0]}` [-h] [-k]
 OPTIONS
 	-h	show this message
 	-k	confirm to generate ssh-key ~/.ssh/id_rsa[.pub] with empty phrase
@@ -28,50 +28,33 @@ Echo() {
 	echo; echo "===== $@ ====="
 }
 
-RepoList="main universe restricted multiverse"
+install_pkgs_brew() {
+}
 
-Echo "check all repositories available"
+install_pkgs_yum() {
+	# TODO
+	# Once I have to setup a system using yum, I may complete this.
+}
 
-# check add-apt-repository can execute
-type add-apt-repository >/dev/null 2>&1 || apt-get install -y software-properties-common
-for repo in $RepoList; do
-	add-apt-repository $repo
-done
+install_pkgs_apt() {
+}
 
-Echo "update and upgrade"
-
-apt update
-apt -y upgrade
-
-Echo "install necessary packages"
-
-# install necessary things
-apt install -y          \
-	git                 \
-	openssh-server      \
-	telnetd             \
-	nfs-kernel-server   \
-	samba               \
-	cifs-utils          \
-	system-config-samba \
-	python              \
-	python3             \
-	vim                 \
-	apache2
-
-Echo "install convenient packages"
-
-# install good things
-# id-utils for gj, a vim's plugin
-apt install -y          \
-	ctags               \
-	tmux                \
-	silversearcher-ag   \
-	jq                  \
-	xsel                \
-	rake                \
-	id-utils            \
-	tree
+case `uname -s` in
+Darwin)
+	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	install_pkgs_brew
+	;;
+Linux)
+	if command -v yum; then
+		install_pkgs_yum
+	elif command -v apt-get; then
+		install_pkgs_apt
+	else
+		echo "unrecognized package manager" >&2
+		exit 1
+	fi
+	;;
+esac
 
 if [ "$UseSSHKey" ]; then
 	Echo "ssh key"

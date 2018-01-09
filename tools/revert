@@ -54,5 +54,4 @@ for f in `cat $INSTALLED_FILE_LIST`; do
 	rm -vf $f
 done
 
-cd "$BKP_DIR"
-tar -cf - . | tar --no-overwrite-dir -xvf - -C /
+tar -C "$BKP_DIR" -cf - -- . | tar -C / --no-overwrite-dir -xvf -

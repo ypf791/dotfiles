@@ -7,5 +7,4 @@ if [ -e $DST -a ! -d $DST ]; then
 fi
 
 install -d -m 755 $DST
-cd $SRC
-tar -cf - . | tar --no-overwrite-dir -xvf - -C $DST
+tar -C "$SRC" -cf - -- . | tar -C "$DST" --no-overwrite-dir -xvf -
