@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "Darwin" = "`uname -s`" ]; then
+	Tar=/usr/local/bin/gtar
+else
+	Tar=/bin/tar
+fi
+
 ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
 
 _show_help() {
@@ -54,4 +60,4 @@ for f in `cat $INSTALLED_FILE_LIST`; do
 	rm -vf $f
 done
 
-tar -C "$BKP_DIR" -cf - -- . | tar -C / --no-overwrite-dir -xvf -
+$Tar -C "$BKP_DIR" -cf - -- . | $Tar -C / --no-overwrite-dir -xvf -

@@ -30,33 +30,36 @@ Echo() {
 
 InstallPkgs="/tmp/install_pkgs.sh"
 
-install_pkgs_brew() {
+install_pkgs() {
+	PreparePkgsUrl=https://raw.githubusercontent.com/ypf791/dotfiles/master/prepare_pkgs
+	case $1 in
 	# TODO
-}
-
-install_pkgs_yum() {
-	# TODO
-	# Once I have to setup a system using yum, I may complete this.
-}
-
-install_pkgs_apt() {
-	wget https://raw.githubusercontent.com/ypf791/dotfiles/master/prepare_pkgs/apt.sh -O "$InstallPkgs"
-	sh "$InstallPkgs"
-	rm "$InstallPkgs"
+	# Once I have to setup a system using yum, I may add it back.
+	brew|yum|apt)
+		wget $PreparePkgsUrl/$1.sh -O "$InstallPkgs"
+		sh "$InstallPkgs"
+		rm "$InstallPkgs"
+	;;
+	esac
 }
 
 case `uname -s` in
 Darwin)
 	if ! command -v brew >/dev/null; then
-		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+		HomebrewInstallUrl=https://raw.githubusercontent.com/Homebrew/install/master/install
+		/usr/bin/ruby -e "$(curl -fsSL $HomebrewInstallUrl)"
 	fi
-	install_pkgs_brew
+	install_pkgs brew
 	;;
 Linux)
 	if command -v yum; then
-		install_pkgs_yum
+		# TODO
+		# Once I have to setup a system using yum, I may add it back.
+		#install_pkgs yum
+		echo "yum is not supported yet"
+		exit 2
 	elif command -v apt-get; then
-		install_pkgs_apt
+		install_pkgs apt
 	else
 		echo "unrecognized package manager" >&2
 		exit 1

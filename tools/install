@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "Darwin" = "`uname -s`" ]; then
+	Tar=/usr/local/bin/gtar
+else
+	Tar=/bin/tar
+fi
+
 SRC="$1" DST="$2"
 
 if [ -e $DST -a ! -d $DST ]; then
@@ -7,4 +13,4 @@ if [ -e $DST -a ! -d $DST ]; then
 fi
 
 install -d -m 755 $DST
-tar -C "$SRC" -cf - -- . | tar -C "$DST" --no-overwrite-dir -xvf -
+$Tar -C "$SRC" -cf - -- . | $Tar -C "$DST" --no-overwrite-dir -xvf -
