@@ -75,6 +75,7 @@ This project includes some brilliant projects. Listed below.
 * [xterm-color-table.vim](https://github.com/guns/xterm-color-table.vim)
 * [NERDTree](https://github.com/scrooloose/nerdtree)
 * [Taboo](https://github.com/gcmt/taboo.vim)
+* [Molokai](https://github.com/tomasr/molokai)
 
 `tmux`:
 * [tpm](https://github.com/tmux-plugins/tpm)
