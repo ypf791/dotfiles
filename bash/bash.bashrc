@@ -58,9 +58,12 @@ fi
 # need to support globally
 _oo_addpath() {
 	while [ 0 -lt $# ]; do
-		path=`unset CDPATH && cd "$(dirname "$1")" && pwd -P`
-		if ! echo $PATH | grep -- "$path" >/dev/null 2>&1; then
-			PATH=$PATH:$path
+		if path=`unset CDPATH && cd "$1" && pwd -P`; then
+			if ! echo $PATH | grep -- "$path" >/dev/null 2>&1; then
+				PATH=$PATH:$path
+			fi
+		else
+			echo "_oo_addpath: ${1}: ignored invalid path" >&2
 		fi
 		shift
 	done
