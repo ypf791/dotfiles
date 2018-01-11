@@ -3,21 +3,19 @@ SPEAKERS=global local
 
 include ../Makefile.inc
 
-COLORSCHEMES= \
-	molokai
-
 PLUGINS= \
 	vim-sensible \
 	vim-fugitive \
 	vim-tmux \
 	xterm-color-table \
 	NERDTree \
-	taboo
+	taboo \
+	molokai
 PLUGINS_DIR=home/.vim/bundle
 
 .PHONY: first
 .PHONY: all global local clean
-.PHONY: pathogen $(PLUGINS)
+.PHONY: vim-pathogen $(PLUGINS)
 
 first: all
 
@@ -27,7 +25,8 @@ global: say.global
 	@$(INSTALL_D) $(SRC_PATH)/etc/vim
 	@$(INSTALL_F) vimrc.local $(abspath $(SRC_PATH)/etc/vim/vimrc.local)
 
-local: check.local $(PLUGINS) $(COLORSCHEMES)
+local: check.local $(PLUGINS)
+	@$(INSTALL_TOOL) ftdetect home/.vim/ftdetect/
 	@echo taking home/ on a trip...
 	@$(INSTALL_TOOL) home $(SRC_HOME_PATH)/
 	@$(INSTALL_F) vimrc $(abspath $(SRC_HOME_PATH)/.vimrc)
@@ -35,23 +34,18 @@ local: check.local $(PLUGINS) $(COLORSCHEMES)
 clean:
 	@rm -vrf home
 
-pathogen:
-	@$(INSTALL_D) home/.vim/bundle
-	@if [ ! -f home/.vim/autoload/$@.vim ]; then \
-		$(INSTALL_D) home/.vim/autoload; \
-		$(INSTALL_F) $(EXT_PROJ)/vim-$@/autoload/$@.vim home/.vim/autoload/$@.vim; \
-	 fi
+vim-pathogen:
+	@for dir in `ls -d $(EXT_PROJ)/$@/*/`; do \
+		$(INSTALL_TOOL) $${dir} home/.vim/`basename $${dir}`; \
+	 done
 
-$(PLUGINS): pathogen
+$(PLUGINS): vim-pathogen
 	@for dir in `ls -d $(EXT_PROJ)/$@/*/`; do \
 		$(INSTALL_TOOL) $${dir} $(PLUGINS_DIR)/$@/`basename $${dir}`; \
 	 done
 	@if [ -d $(PLUGINS_DIR)/$@/doc ]; then \
 		vim -u NONE -c "helptags $(PLUGINS_DIR)/$@/doc" -c q; \
 	 fi
-
-$(COLORSCHEMES):
-	@$(INSTALL_TOOL) $(EXT_PROJ)/$@/colors home/.vim/colors
 
 $(BKP_LIST):
 	@touch $@
