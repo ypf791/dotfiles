@@ -14,6 +14,7 @@ scrooloose/nerdtree:NERDTree
 gcmt/taboo.vim:taboo
 tomasr/molokai
 tmux-plugins/tpm
+tmux-plugins/vim-tmux
 fcamel/gj
 EOF
 }

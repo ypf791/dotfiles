@@ -9,6 +9,7 @@ COLORSCHEMES= \
 PLUGINS= \
 	vim-sensible \
 	vim-fugitive \
+	vim-tmux \
 	xterm-color-table \
 	NERDTree \
 	taboo

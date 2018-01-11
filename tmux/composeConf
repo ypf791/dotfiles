@@ -3,11 +3,11 @@
 __sub_confs() {
 	# powerline.conf is not used yet
 	cat <<EOF
-status.conf
-binding.conf
-misc.conf
-plugins.conf
-_post.conf
+status
+binding
+misc
+plugins
+_post
 EOF
 }
 
@@ -17,5 +17,5 @@ if [ "-l" = "$1" ]; then
 fi
 
 for conf in `__sub_confs`; do
-	cat $conf
+	cat ${conf}.tmux
 done
