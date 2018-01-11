@@ -73,13 +73,13 @@ parse_vimrc() {
 		if [ "/dev/null" = "$3" ]; then
 			echo "$1" >> $deleted_files
 		else
-			cat >>$tempRc <<EOF
-tabe $3
-vert diffsplit $2
-if exists(":TabooRename")
-	TabooRename $1
-endif
-EOF
+			echo "tabe $3" >> $tempRc
+			if ! [ "/dev/null" = "$2" ]; then
+				echo "vert diffsplit $2" >> $tempRc
+			fi
+			echo "if exists(\":TabooRename\")" >> $tempRc
+			echo "	TabooRename $1 \\" >> $tempRc
+			echo "endif" >> $tempRc
 		fi
 		shift 3
 	done
