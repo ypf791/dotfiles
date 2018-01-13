@@ -12,7 +12,7 @@ EOF
 }
 
 if [ "-l" = "$1" ]; then
-	__sub_confs
+	__sub_confs | sed -e 's/$/.tmux/'
 	exit 0
 fi
 

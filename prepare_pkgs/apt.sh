@@ -2,6 +2,10 @@
 
 RepoList="main universe restricted multiverse"
 
+Echo() {
+	echo; echo "===== $@ ====="
+}
+
 Echo "check all repositories available"
 
 # check add-apt-repository can execute
