@@ -12,6 +12,7 @@ tpope/vim-fugitive
 guns/xterm-color-table.vim:xterm-color-table
 scrooloose/nerdtree:NERDTree
 gcmt/taboo.vim:taboo
+majutsushi/tagbar
 tomasr/molokai
 tmux-plugins/tpm
 tmux-plugins/vim-tmux

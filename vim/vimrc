@@ -5,6 +5,13 @@ set autoindent
 set mouse=n
 set ttymouse=xterm2
 
+""" customize @colorscheme molokai
+colorscheme molokai
+hi DiffText cterm=underline,bold ctermbg=239
+
+""" customize @plugin tagbar
+nmap <F8> :TagbarToggle<CR>
+
 """ customize @plugin NERDTree
 map <C-n> :NERDTreeToggle<CR>
 let g:NERDTreeDirArrowExpandable = '+'

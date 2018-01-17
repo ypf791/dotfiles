@@ -10,6 +10,7 @@ PLUGINS= \
 	xterm-color-table \
 	NERDTree \
 	taboo \
+	tagbar \
 	molokai
 PLUGINS_DIR=home/.vim/bundle
 

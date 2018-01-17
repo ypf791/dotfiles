@@ -1,5 +1,4 @@
 set background=dark
-colorscheme molokai
 
 syntax on
 
@@ -17,10 +16,8 @@ noremap <F3> :set relativenumber! relativenumber?<CR>
 set cursorline
 hi CursorLine cterm=NONE ctermbg=236
 
-"hi DiffAdd cterm=none ctermbg=65
-"hi DiffDelete cterm=none ctermfg=8 ctermbg=167
-"hi DiffChange cterm=none ctermbg=96
-hi DiffText cterm=underline,bold ctermbg=239
+hi DiffAdd cterm=none ctermbg=65
+hi DiffDelete cterm=none ctermfg=8 ctermbg=167
+hi DiffChange cterm=none ctermbg=96
+hi DiffText cterm=underline,bold ctermbg=96
 
-au BufRead,BufNewFile *.git/config,gitconfig*,.gitignore set filetype=gitconfig
-au BufRead,BufNewFile *.mak,Makefile* set filetype=make
