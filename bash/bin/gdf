@@ -78,7 +78,7 @@ parse_vimrc() {
 				echo "vert diffsplit $2" >> $tempRc
 			fi
 			echo "if exists(\":TabooRename\")" >> $tempRc
-			echo "	TabooRename $1 \\" >> $tempRc
+			echo "	TabooRename $1" >> $tempRc
 			echo "endif" >> $tempRc
 		fi
 		shift 3
