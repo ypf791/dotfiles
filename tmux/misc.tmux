@@ -3,7 +3,7 @@
 ######
 # Activity monitoring
 setw -g monitor-activity on
-set -g visual-activity on
+set -g visual-activity off
 
 # auto window rename
 setw -g automatic-rename
