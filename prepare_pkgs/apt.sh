@@ -27,6 +27,7 @@ Echo "install necessary packages"
 # install necessary things
 apt install -y          \
 	git                 \
+	make                \
 	openssh-server      \
 	telnetd             \
 	nfs-kernel-server   \
