@@ -1,0 +1,35 @@
+{
+	"root": "/root/test",
+	"tags": [{
+		"name": "branch",
+		"prefix": "/"
+	}, {
+		"name": "platform",
+		"prefix": "/${branch}/ds."
+	}, {
+		"name": "project",
+		"prefix": "/${branch}/ds.${platform}/source/",
+		"condition": "[ \"packages\" != \"${branch}\" ]",
+		"hidden": true
+	}, {
+		"name": "package",
+		"prefix": "/${branch}/source/",
+		"condition": "[ \"packages\" = \"${branch}\" ]",
+		"hidden": true
+	}],
+	"bookmarks": [{
+		"prefix": "/${branch:=curr}/ds.${platform:=base}/source/",
+		"condition": "[ \"packages\" != \"${branch}\" ]",
+		"items": {
+			"src": "/",
+			"ls": "../lnxscripts"
+		}
+	}, {
+		"prefix": "/packages/source",
+		"condition": "[ \"packages\" = \"${branch}\" ]",
+		"items": {
+			"src": "/",
+			"ls": "../pkgscript-ng"
+		}
+	}]
+}

@@ -1,10 +1,11 @@
 #!/bin/bash
 
 ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
+ScriptName=`basename ${BASH_SOURCE[0]}`
 
 _show_help() {
 	cat >&2 << EOF
-USAGE: `basename ${BASH_SOURCE[0]}` [-h] [arguments...]
+USAGE: ${ScriptName} [-h] [arguments...]
 OPTIONS
 	-h	show this message
 ARGUMENTS
@@ -14,8 +15,8 @@ EOF
 
 OPTIND= OPTARG= opt=
 while getopts "h" opt; do
-	if [ "${OPTARG#-}" != "$OPTARG" ]; then
-		echo "$0: option requires an argument -- $opt" >&2
+	if [ "-" = "${OPTARG:0:1}" ]; then
+		echo "${ScriptName}: option requires an argument -- $opt" >&2
 		opt=?
 	fi
 	case $opt in
@@ -39,11 +40,11 @@ _create() {
 	lineno=0
 	while read; do
 		lineno=$((lineno+1))
-		if [ 11 -eq $lineno ]; then
+		if [ 12 -eq $lineno ]; then
 			echo "	(argument descriptions)" >> $1
 			continue
 		fi
-		if [ 29 -lt $lineno ]; then
+		if [ 31 -lt $lineno ]; then
 			break
 		fi
 		echo "$REPLY" >> $1

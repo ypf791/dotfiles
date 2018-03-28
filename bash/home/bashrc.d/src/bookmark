@@ -1,0 +1,35 @@
+#!/bin/bash
+
+ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
+BookmarkJSON="${ScriptPath}/bookmark.json"
+
+root=`jq -r .root ${BookmarkJSON}`
+eval "$(jq -rc '
+	.tags[]
+	| {name, prefix, condition: (.condition // "true"), hidden: (.hidden // false)}
+	| {name, json: (.|tostring|@sh "\(.)")}
+	| @text "declare \(.name)_obj=\(.json); export \"\(.name)_obj\""
+	' ${BookmarkJSON})"
+
+enum_tag() {
+	if $(eval "echo \${${1}_obj}" | jq -r .condition -); then
+		prefix=${root}$(eval "echo \${${1}_obj}" | jq -r .prefix -)
+		prefix=$(eval "echo ${prefix}")
+		/bin/ls -d ${prefix}*/ | sed "s,^${prefix},," | sed "s,/$,,"
+	fi
+}
+
+get_tag() {
+	if $(eval "echo \${${1}_obj}" | jq -r .condition -); then
+		prefix=${root}$(eval "echo \${${1}_obj}" | jq -r .prefix -)
+		prefix=$(eval "echo ${prefix}")
+		current_dir=`pwd | sed "s,^${prefix},,"`
+		echo ${current_dir%%/*}
+	fi
+}
+
+for tag in `jq -r '.tags|.[]|.name' ${BookmarkJSON}`; do
+	declare ${tag}="`get_tag ${tag}`"
+	export "${tag}"
+done
+

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
+. ${ScriptPath}/bookmark
+
+_show_help() {
+	cat >&2 << EOF
+USAGE: to [-h] <back pattern>
+OPTIONS
+	-h	show this message
+ARGUMENTS
+	specify the back pattern of the destination directory.
+EOF
+}
+
+OPTIND= OPTARG= opt=
+while getopts "h" opt; do
+	case ${opt} in
+	h)	_show_help; exit
+		;;
+	?)	_show_help; exit 1
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+if [ -z "$1" ]; then
+	echo "to: must specify back pattern" >&2
+	return 1
+fi
+
+pattern=$1
+dir=`pwd`
+while [ "/" != "$dir" ]; do
+	dir=`dirname $dir`
+	base=`basename $dir`
+	if echo "$base" | grep -q -- "^$pattern" >/dev/null 2>&1; then
+		echo "back to ${dir}" >&2
+		echo ${dir}
+		return 0
+	fi
+done
+
+echo "to: not available back pattern" >&2
+return 2
