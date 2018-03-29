@@ -29,7 +29,7 @@
 		"condition": "[ \"packages\" = \"${branch}\" ]",
 		"items": {
 			"src": "/",
-			"ls": "../pkgscript-ng"
+			"ls": "../pkgscripts-ng"
 		}
 	}]
 }

@@ -3,33 +3,31 @@
 ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
 BookmarkJSON="${ScriptPath}/bookmark.json"
 
-root=`jq -r .root ${BookmarkJSON}`
-eval "$(jq -rc '
-	.tags[]
-	| {name, prefix, condition: (.condition // "true"), hidden: (.hidden // false)}
-	| {name, json: (.|tostring|@sh "\(.)")}
-	| @text "declare \(.name)_obj=\(.json); export \"\(.name)_obj\""
-	' ${BookmarkJSON})"
+_oo_bm_foreach_tag_obj() {
+	local root=`jq -r .root ${BookmarkJSON}`
+	while IFS= read -r line_obj; do
+		local NAME=$(echo ${line_obj} | jq -rc '.name' -)
+		local PREFIX=${root}$(echo ${line_obj} | jq -rc '.prefix' -)
+		local CONDITION=$(echo ${line_obj} | jq -rc '.condition // "true"' -)
+		local HIDDEN=$(echo ${line_obj} | jq -rc '.hidden // false' -)
 
-enum_tag() {
-	if $(eval "echo \${${1}_obj}" | jq -r .condition -); then
-		prefix=${root}$(eval "echo \${${1}_obj}" | jq -r .prefix -)
-		prefix=$(eval "echo ${prefix}")
-		/bin/ls -d ${prefix}*/ | sed "s,^${prefix},," | sed "s,/$,,"
-	fi
+		if eval ${CONDITION}; then
+			local current_dir=`pwd | sed "s,^$(eval "echo ${PREFIX}"),,"`
+			declare ${NAME}="${current_dir%%/*}"
+			export "${NAME}"
+		fi
+
+		"$@"
+	done < <(jq -rc ".tags[]" ${BookmarkJSON})
 }
 
-get_tag() {
-	if $(eval "echo \${${1}_obj}" | jq -r .condition -); then
-		prefix=${root}$(eval "echo \${${1}_obj}" | jq -r .prefix -)
-		prefix=$(eval "echo ${prefix}")
-		current_dir=`pwd | sed "s,^${prefix},,"`
-		echo ${current_dir%%/*}
-	fi
-}
+enum_bookmark() {
+	eval "$(_oo_bm_foreach_tag_obj 'eval' 'echo "local ${NAME}=\"${!NAME}\""')"
 
-for tag in `jq -r '.tags|.[]|.name' ${BookmarkJSON}`; do
-	declare ${tag}="`get_tag ${tag}`"
-	export "${tag}"
-done
+	while IFS= read -r line_obj; do
+		if $(echo ${line_obj} | jq -r .condition -); then
+			echo ${line_obj} | jq -r '.items|keys[]' -
+		fi
+	done < <(jq -rc '.bookmarks[]' ${BookmarkJSON})
+}
 

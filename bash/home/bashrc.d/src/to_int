@@ -3,6 +3,28 @@
 ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
 . ${ScriptPath}/bookmark
 
+_oo_to_gen_wordlist() {
+	tag_list=$(/bin/ls -Ad ${PREFIX}*/ | sed "s,^${PREFIX},," | sed "s,/$,,")
+	
+	for arg in "$COMP_LINE"; do
+		if printf "%s" "${tag_list}" | grep -wq -- "${arg}"; then
+			${NAME}="${arg}"
+			return
+		fi
+	done
+
+	wordlist="${wordlist} ${tag_list}"
+
+	echo "declare ${NAME}=\"${!NAME}\"; export \"${NAME}\""
+}
+
+if [ "--complete" = "${1}" ]; then
+	local wordlist=
+	eval "$(_oo_bm_foreach_tag_obj _oo_to_gen_wordlist)"
+	compgen -W "${wordlist} `enum_bookmark`" -- ${COMP_WORDS[COMP_CWORD]}
+	exit $?
+fi
+
 _show_help() {
 	cat >&2 << EOF
 USAGE: to [-h] <back pattern>
