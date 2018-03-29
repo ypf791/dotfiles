@@ -2,10 +2,12 @@
 	"root": "/root/test",
 	"tags": [{
 		"name": "branch",
-		"prefix": "/"
+		"prefix": "/",
+		"default": "curr"
 	}, {
 		"name": "platform",
-		"prefix": "/${branch}/ds."
+		"prefix": "/${branch}/ds.",
+		"default": "base"
 	}, {
 		"name": "project",
 		"prefix": "/${branch}/ds.${platform}/source/",
@@ -13,12 +15,12 @@
 		"hidden": true
 	}, {
 		"name": "package",
-		"prefix": "/${branch}/source/",
+		"prefix": "/packages/source/",
 		"condition": "[ \"packages\" = \"${branch}\" ]",
 		"hidden": true
 	}],
 	"bookmarks": [{
-		"prefix": "/${branch:=curr}/ds.${platform:=base}/source/",
+		"prefix": "/${branch}/ds.${platform}/source/",
 		"condition": "[ \"packages\" != \"${branch}\" ]",
 		"items": {
 			"src": "/",
@@ -29,7 +31,7 @@
 		"condition": "[ \"packages\" = \"${branch}\" ]",
 		"items": {
 			"src": "/",
-			"ls": "../pkgscripts-ng"
+			"ls": "../pkgscript-ng"
 		}
 	}]
 }

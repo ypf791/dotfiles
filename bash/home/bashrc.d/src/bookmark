@@ -7,26 +7,38 @@ _oo_bm_foreach_tag_obj() {
 	local root=`jq -r .root ${BookmarkJSON}`
 	while IFS= read -r line_obj; do
 		local NAME=$(echo ${line_obj} | jq -rc '.name' -)
-		local PREFIX=${root}$(echo ${line_obj} | jq -rc '.prefix' -)
+		local PREFIX=$(eval "echo \"${root}$(echo ${line_obj} | jq -rc '.prefix' -)\"")
 		local CONDITION=$(echo ${line_obj} | jq -rc '.condition // "true"' -)
-		local HIDDEN=$(echo ${line_obj} | jq -rc '.hidden // false' -)
+		local HIDDEN=$(echo ${line_obj} | jq -rc '.hidden // ""' -)
+		local DEFAULT=$(echo ${line_obj} | jq -rc '.default // ""' -)
 
 		if eval ${CONDITION}; then
-			local current_dir=`pwd | sed "s,^$(eval "echo ${PREFIX}"),,"`
+			local current_dir=`pwd | sed "s,^${PREFIX},,"`
 			declare ${NAME}="${current_dir%%/*}"
-			export "${NAME}"
 		fi
+		if [ -z "${!NAME}" ]; then
+			declare ${NAME}="${DEFAULT}"
+		fi
+		export "${NAME}"
 
 		"$@"
 	done < <(jq -rc ".tags[]" ${BookmarkJSON})
 }
 
-enum_bookmark() {
+_oo_bm_enum_tag() {
+	if [ -z "${HIDDEN}" ]; then
+		echo -n "	${NAME}: "
+		echo $(/bin/ls -Ad ${PREFIX}*/ | sed "s,^${PREFIX},," | sed "s,/$,,")
+	fi
+}
+
+_oo_bm_enum_bookmark() {
 	eval "$(_oo_bm_foreach_tag_obj 'eval' 'echo "local ${NAME}=\"${!NAME}\""')"
 
 	while IFS= read -r line_obj; do
-		if $(echo ${line_obj} | jq -r .condition -); then
-			echo ${line_obj} | jq -r '.items|keys[]' -
+		if eval $(echo ${line_obj} | jq -r .condition -); then
+			echo -n "	bookmark: "
+			echo $(echo ${line_obj} | jq -r '.items|keys[]' -)
 		fi
 	done < <(jq -rc '.bookmarks[]' ${BookmarkJSON})
 }

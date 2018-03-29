@@ -4,34 +4,33 @@ ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
 . ${ScriptPath}/bookmark
 
 _oo_to_gen_wordlist() {
-	tag_list=$(/bin/ls -Ad ${PREFIX}*/ | sed "s,^${PREFIX},," | sed "s,/$,,")
+	tag_list=$(/bin/ls -Ad ${PREFIX}*/ 2>/dev/null | sed "s,^${PREFIX},," | sed "s,/$,,")
 	
-	for arg in "$COMP_LINE"; do
+	for arg in ${comp_line}; do
 		if printf "%s" "${tag_list}" | grep -wq -- "${arg}"; then
-			${NAME}="${arg}"
+			export ${NAME}="${arg}"
 			return
 		fi
 	done
 
 	wordlist="${wordlist} ${tag_list}"
-
+	echo "wordlist=\"${wordlist}\""
 	echo "declare ${NAME}=\"${!NAME}\"; export \"${NAME}\""
 }
 
 if [ "--complete" = "${1}" ]; then
-	local wordlist=
+	comp_line="${2}"
 	eval "$(_oo_bm_foreach_tag_obj _oo_to_gen_wordlist)"
-	compgen -W "${wordlist} `enum_bookmark`" -- ${COMP_WORDS[COMP_CWORD]}
+	echo ${wordlist}
 	exit $?
 fi
 
 _show_help() {
 	cat >&2 << EOF
-USAGE: to [-h] <back pattern>
-OPTIONS
-	-h	show this message
-ARGUMENTS
-	specify the back pattern of the destination directory.
+USAGE: to [-h] [tag...]
+TAGS
+$(_oo_bm_foreach_tag_obj _oo_bm_enum_tag)
+$(_oo_bm_enum_bookmark)
 EOF
 }
 
@@ -49,7 +48,7 @@ shift $((OPTIND-1))
 
 if [ -z "$1" ]; then
 	echo "to: must specify back pattern" >&2
-	return 1
+	exit 1
 fi
 
 pattern=$1
@@ -60,9 +59,9 @@ while [ "/" != "$dir" ]; do
 	if echo "$base" | grep -q -- "^$pattern" >/dev/null 2>&1; then
 		echo "back to ${dir}" >&2
 		echo ${dir}
-		return 0
+		exit 0
 	fi
 done
 
 echo "to: not available back pattern" >&2
-return 2
+exit 2
