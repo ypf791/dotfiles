@@ -11,7 +11,7 @@ _oo_bm_foreach() {
 		eval "$(echo ${line_obj} | jq -r '.|@text "
 			local NAME=\(.name)
 			local PREFIX=\(.prefix)
-			local CONDITION=\"\(.condition // "true")\"
+			local CONDITION='"'"'\(.condition // "true")'"'"'
 			local DEFAULT=\(.default // "")
 		"' -)"
 		PREFIX=$(eval "echo ${root}${PREFIX}")
@@ -21,7 +21,7 @@ _oo_bm_foreach() {
 		declare ${NAME}="${!NAME:=${DEFAULT}}"
 		export "${NAME}"
 
-		"$@"
+		! eval ${CONDITION} || "$@" || return
 	done < <(jq -rc "${filter}" ${BookmarkJSON})
 }
 
@@ -40,12 +40,10 @@ _oo_bm_enum_tag() {
 _oo_bm_enum_bookmarks() {
 	while IFS= read -r line_obj; do
 		eval "$(echo ${line_obj} | jq -r '.|@text "
-			local CONDITION=\"\(.condition // "true")\"
+			local CONDITION='"'"'\(.condition // "true")'"'"'
 			local ITEMS=\"\(.items|keys|join(" "))\"
 		"' -)"
-		if eval ${CONDITION}; then
-			echo -n ${ITEMS} " "
-		fi
+		! eval ${CONDITION} || echo -n ${ITEMS} " "
 	done < <(jq -rc '.bookmarks[]' ${BookmarkJSON})
 }
 
@@ -59,12 +57,12 @@ _oo_bm_foreach_bookmarks() {
 	while IFS= read -r line_obj; do
 		eval "$(echo ${line_obj} | jq -r '.|@text "
 			local PREFIX=\(.prefix)
-			local CONDITION=\"\(.condition // "true")\"
-			local ITEMS=\(.items)
+			local CONDITION='"'"'\(.condition // "true")'"'"'
+			local ITEMS='"'"'\(.items)'"'"'
 		"' -)"
 		PREFIX=$(eval "echo ${root}${PREFIX}")
 
-		"$@" || return
+		! eval ${CONDITION} || "$@" || return
 	done < <(jq -rc ".bookmarks[]" ${BookmarkJSON})
 }
 

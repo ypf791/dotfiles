@@ -22,17 +22,17 @@
 		"prefix": "/${branch}/ds.${platform}/source/",
 		"condition": "[ \"packages\" != \"${branch}\" ]",
 		"items": {
-			"${project}": "${project}",
+			"": "${project}",
 			"src": "",
 			"ls": "../lnxscripts"
 		}
 	}, {
-		"prefix": "/packages/source",
+		"prefix": "/packages/source/",
 		"condition": "[ \"packages\" = \"${branch}\" ]",
 		"items": {
-			"${package}": "${package}",
+			"": "${package}",
 			"src": "",
-			"ls": "../pkgscript-ng"
+			"ls": "../pkgscripts-ng"
 		}
 	}]
 }

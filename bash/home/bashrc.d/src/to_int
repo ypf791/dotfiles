@@ -4,12 +4,8 @@ ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
 . ${ScriptPath}/bookmark
 
 _gen_wordlist() {
-	if ! eval ${CONDITION}; then
-		return
-	fi
-
 	tag_list="$(_oo_bm_enum_tag)"
-	for arg in ${comp_line}; do
+	for arg in $@; do
 		if echo -n "${tag_list}" | grep -xq -- "${arg}" 2>/dev/null; then
 			export ${NAME}="${arg}"
 			tag_list=
@@ -24,8 +20,7 @@ _gen_wordlist() {
 }
 
 if [ "--complete" = "${1}" ]; then
-	comp_line="${2}"
-	eval "$(_oo_bm_foreach_tags _gen_wordlist)" >&2
+	eval "$(_oo_bm_foreach_tags _gen_wordlist "${2}")" >&2
 	echo ${wordlist} $(_oo_bm_enum_bookmarks)
 	exit $?
 fi
@@ -51,47 +46,53 @@ done
 shift $((OPTIND-1))
 
 _compute_tag_value() {
-	if ! eval ${CONDITION}; then
-		return
-	fi
-
 	for arg in "$@"; do
 		if echo -n "$(_oo_bm_enum_tag)" | grep -xq -- "${arg}" 2>/dev/null; then
 			export ${NAME}="${arg}"
+			echo -e "declare matched=\"\${matched}\n${arg}\""
 			break
 		fi
 	done
-
 	echo "declare ${NAME}=\"${!NAME}\"; export \"${NAME}\""
 }
 
-eval "$(_oo_bm_foreach_tags _compute_tag_value "$@")" >&2
-echo "[${branch}, ${platform}, ${project}, ${package}, ${bookmark}]" >&2
+eval "$(_oo_bm_foreach_tags _compute_tag_value "$@")"
+residue=$(comm -23 <(printf "%s\n" "$@" | sort -u) <(echo -n "${matched}" | sort -u))
 
-_construct_path() {
-	if ! eval ${CONDITION}; then
-		return 1
-	fi
-}
-
-eval "$(_oo_bm_foreach_bookmarks 'test' '! _construct_path')"
-
-pattern=${1}
-if [ -z "${pattern}" ]; then
-	echo "to: must specify back pattern" >&2
+if [ 1 -lt $(echo ${residue} | wc -w) ]; then
+	echo "to: too many residual patterns" >&2
+	echo "    residues: ["${residue}"]" >&2
 	exit 1
 fi
 
-dir=$(pwd)
-while [ "/" != "${dir}" ]; do
-	dir=$(dirname ${dir})
-	base=$(basename ${dir})
-	if echo "${base}" | grep -q -- "^${pattern}" 2>/dev/null; then
-		echo "back to ${dir}" >&2
-		echo ${dir}
-		exit 0
-	fi
-done
+_construct_path() {
+	eval "$(echo "${ITEMS}" | jq -r '.|to_entries[]|@text "
+		if [ \"\(.key)\" = \"${residue}\" ]; then
+			echo -n \"to      \" >&2
+			echo ${PREFIX}\(.value) | tee >(tee >&2)
+			exit 0
+		fi
+	"' -)"
+	return 0
+}
 
-echo "to: not available back pattern" >&2
+_oo_bm_foreach_bookmarks _construct_path ${residue}
+
+echo "to: no valid bookmarks found; try to match back pattern" >&2
+
+if [ 1 -eq $# ]; then
+	dir=$(pwd)
+	while [ "/" != "${dir}" ]; do
+		dir=$(dirname ${dir})
+		base=$(basename ${dir})
+		if echo "${base}" | grep -q -- "^${1}" 2>/dev/null; then
+			echo "back to ${dir}" >&2
+			echo ${dir}
+			exit 0
+		fi
+	done
+fi
+
+echo "to: no valid back patterns found" >&2
 exit 2
+
