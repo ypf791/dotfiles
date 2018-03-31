@@ -24,6 +24,11 @@ apt -y upgrade
 
 Echo "install necessary packages"
 
+# install man pages
+apt install -y          \
+	manpages-dev        \
+	manpages-posix-dev
+
 # install necessary things
 apt install -y          \
 	git                 \

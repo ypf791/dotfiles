@@ -1,6 +1,6 @@
 #!/bin/bash
 
-to() {
+oo_to() {
 	if [ ! -x ~/.bashrc.d/src/to_int ]; then
 		echo "to: missing internal binary" >&2
 		return 255
@@ -8,7 +8,10 @@ to() {
 
 	if [ "${COMP_WORDS+isset}" ]; then
 		local cur="${COMP_WORDS[COMP_CWORD]}"
-		COMPREPLY=( $(compgen -W "$(~/.bashrc.d/src/to_int --complete "${COMP_LINE}")" -- ${cur}) )
+		if [ 1 -lt ${COMP_CWORD} ]; then
+			local comp_args=${COMP_WORDS[@]:1:COMP_CWORD-1}
+		fi
+		COMPREPLY=( $(compgen -W "$(~/.bashrc.d/src/to_int --complete "${comp_args}")" -- ${cur}) )
 		return 0
 	fi
 
@@ -19,4 +22,4 @@ to() {
 	return $?
 }
 
-complete -F to to
+complete -F oo_to oo_to

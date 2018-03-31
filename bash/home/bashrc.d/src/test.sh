@@ -7,11 +7,10 @@ enum_bookmark
 exit 0
 
 test_fx() {
-	echo ===$NAME=== >&2
-	echo value: 	$(eval echo \${${NAME}+isset}) >&2
-	echo prefix:	$PREFIX >&2
-	echo condition:	$CONDITION >&2
-	echo hidden:	$HIDDEN >&2
+	echo ===${NAME}=== >&2
+	echo "value:     [${!NAME}]" >&2
+	echo "prefix:     ${PREFIX}" >&2
+	echo "condition:  ${CONDITION}" >&2
 
 	echo "declare ${NAME}=\"${!NAME}\"; export \"${NAME}\""
 }

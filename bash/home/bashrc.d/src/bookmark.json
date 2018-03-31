@@ -1,6 +1,6 @@
 {
 	"root": "/root/test",
-	"tags": [{
+	"exported_tags": [{
 		"name": "branch",
 		"prefix": "/",
 		"default": "curr"
@@ -8,29 +8,30 @@
 		"name": "platform",
 		"prefix": "/${branch}/ds.",
 		"default": "base"
-	}, {
+	}],
+	"hidden_tags": [{
 		"name": "project",
 		"prefix": "/${branch}/ds.${platform}/source/",
-		"condition": "[ \"packages\" != \"${branch}\" ]",
-		"hidden": true
+		"condition": "[ \"packages\" != \"${branch}\" ]"
 	}, {
 		"name": "package",
 		"prefix": "/packages/source/",
-		"condition": "[ \"packages\" = \"${branch}\" ]",
-		"hidden": true
+		"condition": "[ \"packages\" = \"${branch}\" ]"
 	}],
 	"bookmarks": [{
 		"prefix": "/${branch}/ds.${platform}/source/",
 		"condition": "[ \"packages\" != \"${branch}\" ]",
 		"items": {
-			"src": "/",
+			"${project}": "${project}",
+			"src": "",
 			"ls": "../lnxscripts"
 		}
 	}, {
 		"prefix": "/packages/source",
 		"condition": "[ \"packages\" = \"${branch}\" ]",
 		"items": {
-			"src": "/",
+			"${package}": "${package}",
+			"src": "",
 			"ls": "../pkgscript-ng"
 		}
 	}]

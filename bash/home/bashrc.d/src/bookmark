@@ -3,43 +3,68 @@
 ScriptPath=`unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd`
 BookmarkJSON="${ScriptPath}/bookmark.json"
 
-_oo_bm_foreach_tag_obj() {
-	local root=`jq -r .root ${BookmarkJSON}`
+_oo_bm_foreach() {
+	local root=$(jq -r .root ${BookmarkJSON})
+	filter=${1}
+	shift 1
 	while IFS= read -r line_obj; do
-		local NAME=$(echo ${line_obj} | jq -rc '.name' -)
-		local PREFIX=$(eval "echo \"${root}$(echo ${line_obj} | jq -rc '.prefix' -)\"")
-		local CONDITION=$(echo ${line_obj} | jq -rc '.condition // "true"' -)
-		local HIDDEN=$(echo ${line_obj} | jq -rc '.hidden // ""' -)
-		local DEFAULT=$(echo ${line_obj} | jq -rc '.default // ""' -)
+		eval "$(echo ${line_obj} | jq -r '.|@text "
+			local NAME=\(.name)
+			local PREFIX=\(.prefix)
+			local CONDITION=\"\(.condition // "true")\"
+			local DEFAULT=\(.default // "")
+		"' -)"
+		PREFIX=$(eval "echo ${root}${PREFIX}")
 
-		if eval ${CONDITION}; then
-			local current_dir=`pwd | sed "s,^${PREFIX},,"`
-			declare ${NAME}="${current_dir%%/*}"
-		fi
-		if [ -z "${!NAME}" ]; then
-			declare ${NAME}="${DEFAULT}"
-		fi
+		local current_dir=$(pwd | sed "s,^${PREFIX},,")
+		declare ${NAME}="${current_dir%%/*}"
+		declare ${NAME}="${!NAME:=${DEFAULT}}"
 		export "${NAME}"
 
 		"$@"
-	done < <(jq -rc ".tags[]" ${BookmarkJSON})
+	done < <(jq -rc "${filter}" ${BookmarkJSON})
+}
+
+_oo_bm_foreach_exported_tags() {
+	_oo_bm_foreach '.exported_tags[]' "$@"
+}
+
+_oo_bm_foreach_tags() {
+	_oo_bm_foreach '.exported_tags[], .hidden_tags[]' "$@"
 }
 
 _oo_bm_enum_tag() {
-	if [ -z "${HIDDEN}" ]; then
-		echo -n "	${NAME}: "
-		echo $(/bin/ls -Ad ${PREFIX}*/ | sed "s,^${PREFIX},," | sed "s,/$,,")
-	fi
+	/bin/ls -Ad ${PREFIX}*/ 2>/dev/null | sed "s,^${PREFIX},," | sed "s,/$,,"
 }
 
-_oo_bm_enum_bookmark() {
-	eval "$(_oo_bm_foreach_tag_obj 'eval' 'echo "local ${NAME}=\"${!NAME}\""')"
-
+_oo_bm_enum_bookmarks() {
 	while IFS= read -r line_obj; do
-		if eval $(echo ${line_obj} | jq -r .condition -); then
-			echo -n "	bookmark: "
-			echo $(echo ${line_obj} | jq -r '.items|keys[]' -)
+		eval "$(echo ${line_obj} | jq -r '.|@text "
+			local CONDITION=\"\(.condition // "true")\"
+			local ITEMS=\"\(.items|keys|join(" "))\"
+		"' -)"
+		if eval ${CONDITION}; then
+			echo -n ${ITEMS} " "
 		fi
 	done < <(jq -rc '.bookmarks[]' ${BookmarkJSON})
+}
+
+_oo_bm_enum_bookmarks_wrt_exported_tags() {
+	eval "$(_oo_bm_foreach_exported_tags 'eval' 'echo "local ${NAME}=\"${!NAME}\""')"
+	_oo_bm_enum_bookmarks
+}
+
+_oo_bm_foreach_bookmarks() {
+	local root=$(jq -r .root ${BookmarkJSON})
+	while IFS= read -r line_obj; do
+		eval "$(echo ${line_obj} | jq -r '.|@text "
+			local PREFIX=\(.prefix)
+			local CONDITION=\"\(.condition // "true")\"
+			local ITEMS=\(.items)
+		"' -)"
+		PREFIX=$(eval "echo ${root}${PREFIX}")
+
+		"$@" || return
+	done < <(jq -rc ".bookmarks[]" ${BookmarkJSON})
 }
 
