@@ -1,6 +1,6 @@
 #!/bin/bash
 
-oo_to() {
+to() {
 	if [ ! -x ~/.bashrc.d/src/to_int ]; then
 		echo "to: missing internal binary" >&2
 		return 255
@@ -22,4 +22,4 @@ oo_to() {
 	return $?
 }
 
-complete -F oo_to oo_to
+complete -F to to
