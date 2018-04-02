@@ -32,6 +32,7 @@ apt install -y          \
 # install necessary things
 apt install -y          \
 	git                 \
+	g++                 \
 	make                \
 	openssh-server      \
 	telnetd             \
