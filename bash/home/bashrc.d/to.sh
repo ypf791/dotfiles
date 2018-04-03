@@ -1,7 +1,8 @@
 #!/bin/bash
 
 to() {
-	if [ ! -x ~/.bashrc.d/src/to_int ]; then
+	local to_int=~/.bashrc.d/src/to_int
+	if [ ! -x ${to_int} ]; then
 		echo "to: missing internal binary" >&2
 		return 255
 	fi
@@ -11,11 +12,23 @@ to() {
 		if [ 1 -lt ${COMP_CWORD} ]; then
 			local comp_args=${COMP_WORDS[@]:1:COMP_CWORD-1}
 		fi
-		COMPREPLY=( $(compgen -W "$(~/.bashrc.d/src/to_int --complete "${comp_args}")" -- ${cur}) )
+		COMPREPLY=( $(compgen -W "$(${to_int} --complete "${comp_args}")" -- ${cur}) )
 		return 0
 	fi
 
-	local cd_path=$(~/.bashrc.d/src/to_int "$@")
+	local OPTIND= OPTARG= opt=
+	while getopts "h" opt; do
+		case ${opt} in
+		h)	${to_int} --help; return 0
+			;;
+		?)	${to_int} --help; return 1
+			;;
+		esac
+	done
+
+	shift $((OPTIND-1))
+
+	local cd_path=$(${to_int} "$@")
 	if [ 0 -eq $? -a -n "${cd_path}" ]; then
 		cd ${cd_path}
 	fi

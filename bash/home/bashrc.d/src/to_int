@@ -13,10 +13,10 @@ _gen_wordlist() {
 		fi
 	done
 
-	echo "declare ${NAME}=\"${!NAME}\"; export \"${NAME}\""
 	if [ "${tag_list}" ]; then
 		echo "wordlist=\"\${wordlist} ${tag_list}\""
 	fi
+	echo "declare ${NAME}=\"${!NAME}\"; export \"${NAME}\""
 }
 
 if [ "--complete" = "${1}" ]; then
@@ -25,25 +25,14 @@ if [ "--complete" = "${1}" ]; then
 	exit $?
 fi
 
-_show_help() {
+if [ "--help" = "${1}" ]; then
 	cat >&2 << EOF
 USAGE: to [-h] [back_pattern|tags...]
 $(_oo_bm_foreach_exported_tags 'eval' 'echo "  ${NAME}:" $(_oo_bm_enum_tag)')
-  bookmark: $(_oo_bm_enum_bookmarks_wrt_exported_tags)
+  bookmark: $(echo `_oo_bm_enum_bookmarks_wrt_exported_tags`)
 EOF
-}
-
-OPTIND= OPTARG= opt=
-while getopts "h" opt; do
-	case ${opt} in
-	h)	_show_help; exit
-		;;
-	?)	_show_help; exit 1
-		;;
-	esac
-done
-
-shift $((OPTIND-1))
+	exit 0
+fi
 
 _compute_tag_value() {
 	for arg in "$@"; do
@@ -67,9 +56,9 @@ fi
 
 _construct_path() {
 	eval "$(echo "${ITEMS}" | jq -r '.|to_entries[]|@text "
-		if [ \"\(.key)\" = \"${residue}\" ]; then
+		if [ \"\(.key)\" = \"'"${1}"'\" ]; then
 			echo -n \"to      \" >&2
-			echo ${PREFIX}\(.value) | tee >(tee >&2)
+			echo ${PREFIX}\(.value) | tee >(cat >&2)
 			exit 0
 		fi
 	"' -)"
