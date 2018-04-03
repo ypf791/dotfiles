@@ -1,38 +1,11 @@
 {
-	"root": "/root/test",
-	"exported_tags": [{
-		"name": "branch",
-		"prefix": "/",
-		"default": "curr"
-	}, {
-		"name": "platform",
-		"prefix": "/${branch}/ds.",
-		"default": "base"
-	}],
-	"hidden_tags": [{
-		"name": "project",
-		"prefix": "/${branch}/ds.${platform}/source/",
-		"condition": "[ \"packages\" != \"${branch}\" ]"
-	}, {
-		"name": "package",
-		"prefix": "/packages/source/",
-		"condition": "[ \"packages\" = \"${branch}\" ]"
-	}],
+	"root": "",
+	"exported_tags": [],
+	"hidden_tags": [],
 	"bookmarks": [{
-		"prefix": "/${branch}/ds.${platform}/source/",
-		"condition": "[ \"packages\" != \"${branch}\" ]",
+		"prefix": "${HOME}/",
 		"items": {
-			"": "${project}",
-			"src": "",
-			"ls": "../lnxscripts"
-		}
-	}, {
-		"prefix": "/packages/source/",
-		"condition": "[ \"packages\" = \"${branch}\" ]",
-		"items": {
-			"": "${package}",
-			"src": "",
-			"ls": "../pkgscripts-ng"
+			"dot": "dotfiles"
 		}
 	}]
 }
