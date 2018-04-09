@@ -35,14 +35,16 @@ EOF
 fi
 
 _compute_tag_value() {
+	declare tag_matched=""
+	export tag_matched
 	for arg in "$@"; do
 		if echo -n "$(_oo_bm_enum_tag)" | grep -xq -- "${arg}" 2>/dev/null; then
-			export ${NAME}="${arg}"
+			export tag_matched="${arg}"
 			echo -e "declare matched=\"\${matched}\n${arg}\""
 			break
 		fi
 	done
-	echo "declare ${NAME}=\"${!NAME}\"; export \"${NAME}\""
+	echo "declare ${NAME}=\"${tag_matched:=${!NAME}}\"; export \"${NAME}\""
 }
 
 eval "$(_oo_bm_foreach_tags _compute_tag_value "$@")"
