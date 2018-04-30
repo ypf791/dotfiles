@@ -35,20 +35,27 @@ EOF
 fi
 
 _compute_tag_value() {
-	declare tag_matched=""
-	export tag_matched
 	for arg in "$@"; do
 		if echo -n "$(_oo_bm_enum_tag)" | grep -xq -- "${arg}" 2>/dev/null; then
-			export tag_matched="${arg}"
+			export ${NAME}="${arg}"
 			echo -e "declare matched=\"\${matched}\n${arg}\""
 			break
 		fi
 	done
-	echo "declare ${NAME}=\"${tag_matched:=${!NAME}}\"; export \"${NAME}\""
+	echo "declare ${NAME}=\"${!NAME:=\${${NAME}_org\}}\"; export \"${NAME}\""
 }
 
-eval "$(_oo_bm_foreach_tags _compute_tag_value "$@")"
+eval "$( \
+	_oo_bm_foreach_tags 'eval' 'echo "declare ${NAME}_org=\"${!NAME}\""'; \
+	_oo_bm_foreach_tags _compute_tag_value "$@" \
+)"
 residue=$(comm -23 <(printf "%s\n" "$@" | sort -u) <(echo -n "${matched}" | sort -u))
+
+if [ -n "${_oo_VERBOSE}" ]; then
+	echo 'origin   : ' [$branch_org] [$platform_org] [$project_org] [$package_org] >&2
+	echo 'override : ' [$branch] [$platform] [$project] [$package] >&2
+	echo 'residue  : ' [$residue] >&2
+fi
 
 if [ 1 -lt $(echo ${residue} | wc -w) ]; then
 	echo "to: too many residual patterns" >&2

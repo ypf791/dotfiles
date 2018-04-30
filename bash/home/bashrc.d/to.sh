@@ -17,8 +17,10 @@ to() {
 	fi
 
 	local OPTIND= OPTARG= opt=
-	while getopts "h" opt; do
+	while getopts "dh" opt; do
 		case ${opt} in
+		d)	_oo_VERBOSE=on
+			;;
 		h)	${to_int} --help; return 0
 			;;
 		?)	${to_int} --help; return 1
@@ -28,7 +30,7 @@ to() {
 
 	shift $((OPTIND-1))
 
-	local cd_path=$(${to_int} "$@")
+	local cd_path=$(env ${_oo_VERBOSE:+_oo_VERBOSE=on} ${to_int} "$@")
 	if [ 0 -eq $? -a -n "${cd_path}" ]; then
 		cd ${cd_path}
 	fi
