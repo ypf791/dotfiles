@@ -9,3 +9,4 @@
 	la = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	ll = log --graph --decorate --pretty=oneline --abbrev-commit
 	lf = log --stat --decorate --format=fuller abbrev-commit
+	ls = log --graph --pretty=oneline --abbrev-commit --all
