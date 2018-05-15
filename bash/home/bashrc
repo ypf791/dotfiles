@@ -54,7 +54,7 @@ __oo_prompt_cmd() {
 
 	local PS1_CHROOT='${debian_chroot:+($debian_chroot)}'
 	local PS1_USERHOST='[\u@\h \A]'
-	local PS1_RET='[$(printf "%2x" $RET)]'
+	local PS1_RET='[$(printf "%2x" '"$RET"')]'
 	local PS1_PATH='[\w]'
 	local PS1_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 
