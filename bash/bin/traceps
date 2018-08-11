@@ -1,0 +1,91 @@
+#!/bin/bash
+
+ScriptPath=$(unset CDPATH && cd "$(dirname ${BASH_SOURCE[0]})" >/dev/null && pwd)
+ScriptName=$(basename ${BASH_SOURCE[0]})
+
+_show_help() {
+	cat >&2 << EOF
+USAGE:
+	${ScriptName} [-h|--help] [--no-stdout] [--no-param] [--no-date] [--no-ts]
+		[-f|--flag <option>] [-p|--prefix <prefix>] <binary>
+OPTIONS
+	-h, --help      show this message
+	--no-stdout     do not print log to stdout
+	--no-param      do not show command parameters
+	--no-date       do not show calling date
+	--no-ts         do not show calling timestamp
+	-f, --flag      options for ps command
+	-p, --prefix    prefix of log file
+ARGUMENTS
+	<binary>        the binary file to trace its process tree
+EOF
+}
+
+SHORT_OPTS=hf:p:
+LONG_OPTS=help,no-stdout,no-param,no-date,no-ts,flag:,prefix:
+SORTED_ARGS=$(getopt -n ${ScriptName} -o ${SHORT_OPTS} --long ${LONG_OPTS} -- "$@")
+[ $? == 0 ] || exit 1
+
+eval set -- "${SORTED_ARGS}"
+NO_STDOUT= LOG_PARAM=yes LOG_DATE=yes LOG_TS=yes
+PS_OPTS=af PREFIX=root/oo-
+while true; do
+	case "$1" in
+	-h|--help)   _show_help;      exit;;
+	-f|--flag)   PS_OPTS="$2";    shift 2;;
+	-p|--prefix) PREFIX="$2";     shift 2;;
+	--no-stdout) NO_STDOUT=yes;   shift;;
+	--no-param)  unset LOG_PARAM; shift;;
+	--no-date)   unset LOG_DATE;  shift;;
+	--no-ts)     unset LOG_TS;    shift;;
+	--) shift; break;;
+	esac
+done
+
+#echo [$LOG_PARAM] [$LOG_DATE] [$LOG_TS] [$PS_OPTS]
+
+if [ 1 -ne $# ]; then
+	echo "Only accept one binary. Terminating..." >&2
+	exit 2
+fi
+
+BINARY=$1
+if [ ! -x ${BINARY} ]; then
+	echo "[${BINARY}] must be an executable file!!" >&2
+	exit 3
+fi
+
+_prepare_script() {
+	RET=$(mktemp ${BINARY}.XXXXXXXX)
+
+	(
+	echo '#!/bin/bash'
+	echo 'CmdName=$(basename $0)'
+	echo '('
+	echo 'echo "====================[$CmdName]===================="'
+	[ ${LOG_PARAM:+x} ] && echo 'echo "* Params:    " $@'
+	[ ${LOG_DATE:+x} ]  && echo 'echo "* Date:      " $(date)'
+	[ ${LOG_TS:+x} ]    && echo 'echo "* Timestamp: " $(date +%s.%N)'
+	echo 'echo "* Process Tree:"'
+	echo 'echo "--"'
+	echo 'ps '"${PS_OPTS}"
+	echo 'echo "=====================$CmdName====================="'
+	echo ') 2>&1 | tee -a /'"${PREFIX}"'$CmdName.log '"${NO_STDOUT:+>/dev/null}"
+	echo '[ -x '"${BINARY}"'.bak ] && (exec -a "$0" bash -c "'"${BINARY}"'.bak" "$@")'
+	) > ${RET}
+
+	chmod +x ${RET}
+	echo ${RET}
+}
+
+BINARY_SCRIPT=$(_prepare_script ${BINARY})
+
+if [ -e ${BINARY}.bak ]; then
+	echo "[${BINARY}.bak] already existed. Failed to backup." >&2
+	rm -f "${BINARY_SCRIPT}"
+	exit 4
+fi
+
+mv "${BINARY}" "${BINARY}.bak"
+mv "${BINARY_SCRIPT}" "${BINARY}"
+
