@@ -49,7 +49,7 @@ if [ 1 -ne $# ]; then
 	exit 2
 fi
 
-BINARY=$1
+BINARY=$(readlink -f $1)
 if [ ! -x ${BINARY} ]; then
 	echo "[${BINARY}] must be an executable file!!" >&2
 	exit 3
@@ -71,7 +71,7 @@ _prepare_script() {
 	echo 'ps '"${PS_OPTS}"
 	echo 'echo "=====================$CmdName====================="'
 	echo ') 2>&1 | tee -a /'"${PREFIX}"'$CmdName.log '"${NO_STDOUT:+>/dev/null}"
-	echo '[ -x '"${BINARY}"'.bak ] && (exec -a "$0" bash -c "'"${BINARY}"'.bak" "$@")'
+	echo '[ -x '"${BINARY}"'.bak ] && exec -a "$0" "'"${BINARY}"'.bak" "$@"'
 	) > ${RET}
 
 	chmod +x ${RET}
