@@ -6,7 +6,7 @@
 
 1. Starting from a brand new system, use
 ```bash
-cd
+cd; apt update; apt install -y wget
 wget https://raw.githubusercontent.com/ypf791/dotfiles/master/prepare.sh -O ~/prepare.sh
 bash prepare.sh
 ```
