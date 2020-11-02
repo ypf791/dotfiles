@@ -30,8 +30,8 @@ apt install -y          \
 	manpages-posix-dev
 
 # install necessary things
-# Note: system-config-samba seems not exists on new Ubuntu
-apt install -m -y       \
+apt install -y          \
+	net-tools           \
 	git                 \
 	g++                 \
 	make                \
@@ -39,17 +39,19 @@ apt install -m -y       \
 	nfs-kernel-server   \
 	samba               \
 	cifs-utils          \
-	system-config-samba \
-	python              \
 	python3             \
 	vim                 \
 	apache2
+
+# Note: system-config-samba seems not exists on new Ubuntu
+apt install -y \
+	system-config-samba
 
 Echo "install convenient packages"
 
 # install good things
 # Note: id-utils for gj, a vim's plugin
-apt install -m -y       \
+apt install -y          \
 	ctags               \
 	tmux                \
 	silversearcher-ag   \
