@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RepoList="main universe restricted multiverse"
+RepoList="main universe restricted multiverse ppa:deadsnakes/ppa"
 
 Echo() {
 	echo; echo "===== $@ ====="
@@ -17,10 +17,10 @@ for repo in $RepoList; do
 	add-apt-repository $repo
 done
 
-Echo "update and upgrade"
+Echo "update repos"
 
 apt update
-apt -y upgrade
+#apt -y upgrade
 
 Echo "install necessary packages"
 
@@ -30,12 +30,12 @@ apt install -y          \
 	manpages-posix-dev
 
 # install necessary things
-apt install -y          \
+# Note: system-config-samba seems not exists on new Ubuntu
+apt install -m -y       \
 	git                 \
 	g++                 \
 	make                \
 	openssh-server      \
-	telnetd             \
 	nfs-kernel-server   \
 	samba               \
 	cifs-utils          \
@@ -48,8 +48,8 @@ apt install -y          \
 Echo "install convenient packages"
 
 # install good things
-# id-utils for gj, a vim's plugin
-apt install -y          \
+# Note: id-utils for gj, a vim's plugin
+apt install -m -y       \
 	ctags               \
 	tmux                \
 	silversearcher-ag   \
