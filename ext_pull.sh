@@ -17,7 +17,7 @@ tomasr/molokai
 tmux-plugins/tpm
 tmux-plugins/vim-tmux
 fcamel/gj
-cakebaker/scss-syntax
+cakebaker/scss-syntax.vim
 ClockworkNet/vim-apparmor
 chrisbra/vim-diff-enhanced
 jelera/vim-javascript-syntax
