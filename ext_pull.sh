@@ -17,6 +17,12 @@ tomasr/molokai
 tmux-plugins/tpm
 tmux-plugins/vim-tmux
 fcamel/gj
+cakebaker/scss-syntax
+ClockworkNet/vim-apparmor
+chrisbra/vim-diff-enhanced
+jelera/vim-javascript-syntax
+aserebryakov/vim-todo-lists
+posva/vim-vue
 EOF
 }
 
