@@ -9,21 +9,29 @@ if [ "-w" = "$1" ]; then
 		echo >&2
 	fi
 
-	wrapDir=$2
-	params=$3
+	shift
+	wrapDir="$1"; shift
+	base="$1"; shift
 
-	shift 3
-	for i in 1 2; do
-		_1=$1
-		if [ "${1:0:${#tmpDirDef}}" = "$tmpDirDef" ]; then
-			_1=$wrapDir/`basename $1`
-			ln $1 $_1
+	echo -n "$base "
+	for i in lhs rhs; do
+		filepath="$1"; shift
+
+		if [ "$filepath" = "$base" ] || [ "$filepath" = "/dev/null" ]; then
+			echo -n "$filepath "
+		else
+			{
+				mkdir -p ${_oo_VERBOSE:+-v} "$wrapDir/$i"
+				mkdir -p ${_oo_VERBOSE:+-v} "$(dirname "$wrapDir/$i/$base")"
+				if ! ln ${_oo_VERBOSE:+-v} "$filepath" "$wrapDir/$i/$base"; then
+					cp ${_oo_VERBOSE:+-v} "$filepath" "$wrapDir/$i/$base"
+				fi
+			} >&2
+			echo -n "$wrapDir/$i/$base "
 		fi
-		params="$params $_1"
-		shift
 	done
+	echo
 
-	echo "$params"
 	exit 0
 fi
 
