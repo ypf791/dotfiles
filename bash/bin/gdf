@@ -1,8 +1,14 @@
 #!/bin/bash
 
-tmpDirDef=${tmpDirDef:-/tmp/}
+tmpDirDef="${tmpDirDef:-${TMPDIR:-/tmp/}}"
 
 if [ "-w" = "$1" ]; then
+	if [ -n "$_oo_VERBOSE" ]; then
+		echo "[arguments for -w]" >&2
+		echo "$*" >&2
+		echo >&2
+	fi
+
 	wrapDir=$2
 	params=$3
 
@@ -29,8 +35,8 @@ gitRoot=`dirname $gitRoot`
 
 cd $gitRoot
 if [ 'Darwin' = `uname -s` ]; then
-	tempDir=`mktemp -d -t ".gdf_XXXX"` || exit 1
-	tempRc=`mktemp -t "vim.XXXX"` || exit 1
+	tempDir=`mktemp -d -t "gdf"` || exit 1
+	tempRc=`mktemp -t "gdf.vim"` || exit 1
 else
 	tempDir=`mktemp -d -p $tmpDirDef -t "gdf_XXXX"` || exit 1
 	tempRc=`mktemp -p $tempDir -t "vim.XXXX"` || exit 1
@@ -38,17 +44,18 @@ fi
 cd - >/dev/null
 
 _exit() {
+	rm -f "$tempRc"
 	rm -rf "$tempDir"
 	exit $1
 }
 
-if [ -n "$verbose" ]; then
+if [ -n "$_oo_VERBOSE" ]; then
 	echo "invoking git-difftool..."
 	echo "force apply options --no-prompt --tool=vimdiff..."
 fi
 
 gdfCmd="git difftool"
-appendCmd="-y -x '`basename ${BASH_SOURCE[0]}` -w $tempDir \$BASE'"
+appendCmd="-y -x '_oo_VERBOSE=\"$_oo_VERBOSE\" \"`basename ${BASH_SOURCE[0]}`\" -w \"$tempDir\" \"\$BASE\"'"
 while [ 0 -lt $# ]; do
 	if [ "--" != "$1" ]; then
 		gdfCmd="$gdfCmd \"$1\""
@@ -86,7 +93,18 @@ parse_vimrc() {
 }
 
 cd $gitRoot
-parse_vimrc `eval "$gdfCmd"`
+gdfCmdResult="$(eval "$gdfCmd")"
+parse_vimrc $gdfCmdResult
+if [ -n "$_oo_VERBOSE" ]; then
+	echo "[gdfCmd]"
+	echo "$gdfCmd"
+	echo
+	echo "[gdfCmdResult]"
+	echo "$gdfCmdResult"
+	echo
+	echo "[vimrc ($tempRc)]"
+	cat "$tempRc"
+fi
 
 if [ -s $tempRc ]; then
 	echo "tabfirst" >> $tempRc
@@ -95,7 +113,9 @@ if [ -s $tempRc ]; then
 	else
 		echo "tabclose" >> $tempRc
 	fi
-	vim -S $tempRc
+	if [ -z "$_oo_DRYRUN" ]; then
+		vim -S "$tempRc"
+	fi
 else
 	echo "No difference found !" >&2
 fi
