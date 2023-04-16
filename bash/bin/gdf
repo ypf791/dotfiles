@@ -75,34 +75,39 @@ while [ 0 -lt $# ]; do
 done
 gdfCmd="$gdfCmd $appendCmd"
 
-[ 0 -ne $? ] && exit $?
-
-deleted_files="$tempDir/.deleted_files"
-
-parse_vimrc() {
+create_vimrc() {
 	if [ 0 -eq $# ]; then
 		return 1
 	fi
-	echo "au! BufEnter *" >> $tempRc
+
+	local deleted_files="$tempDir/.deleted_files"
+
+	echo "au! BufEnter *"
 	while [ $# -ge 3 ]; do
 		if [ "/dev/null" = "$3" ]; then
-			echo "$1" >> $deleted_files
+			echo "$1" >> "$deleted_files"
 		else
-			echo "tabe $3" >> $tempRc
+			echo "tabe $3"
 			if ! [ "/dev/null" = "$2" ]; then
-				echo "vert diffsplit $2" >> $tempRc
+				echo "vert diffsplit $2"
 			fi
-			echo "if exists(\":TabooRename\")" >> $tempRc
-			echo "	TabooRename $1" >> $tempRc
-			echo "endif" >> $tempRc
+			echo "if exists(\":TabooRename\")"
+			echo "	TabooRename $1"
+			echo "endif"
 		fi
 		shift 3
 	done
+	echo "tabfirst"
+	if [ -s "$deleted_files" ]; then
+		echo "e $deleted_files"
+	else
+		echo "tabclose"
+	fi
 }
 
 cd $gitRoot
 gdfCmdResult="$(eval "$gdfCmd")"
-parse_vimrc $gdfCmdResult
+create_vimrc $gdfCmdResult > "$tempRc"
 if [ -n "$_oo_VERBOSE" ]; then
 	echo "[gdfCmd]"
 	echo "$gdfCmd"
@@ -114,13 +119,7 @@ if [ -n "$_oo_VERBOSE" ]; then
 	cat "$tempRc"
 fi
 
-if [ -s $tempRc ]; then
-	echo "tabfirst" >> $tempRc
-	if [ -s $deleted_files ]; then
-		echo "e $deleted_files" >> $tempRc
-	else
-		echo "tabclose" >> $tempRc
-	fi
+if [ -s "$tempRc" ]; then
 	if [ -z "$_oo_DRYRUN" ]; then
 		vim -S "$tempRc"
 	fi
