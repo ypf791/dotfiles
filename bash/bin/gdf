@@ -88,29 +88,17 @@ create_vimrc() {
 		return 1
 	fi
 
-	local deleted_files="$tempDir/.deleted_files"
-
 	echo "au! BufEnter *"
 	while [ $# -ge 3 ]; do
-		if [ "/dev/null" = "$3" ]; then
-			echo "$1" >> "$deleted_files"
-		else
-			echo "tabe $3"
-			if ! [ "/dev/null" = "$2" ]; then
-				echo "vert diffsplit $2"
-			fi
-			echo "if exists(\":TabooRename\")"
-			echo "	TabooRename $1"
-			echo "endif"
-		fi
+		echo "tabe $3"
+		echo "vert diffsplit $2"
+		echo "if exists(\":TabooRename\")"
+		echo "	TabooRename $1"
+		echo "endif"
 		shift 3
 	done
 	echo "tabfirst"
-	if [ -s "$deleted_files" ]; then
-		echo "e $deleted_files"
-	else
-		echo "tabclose"
-	fi
+	echo "tabclose"
 }
 
 cd $gitRoot
