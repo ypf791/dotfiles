@@ -1,7 +1,6 @@
 #!/bin/bash
 
 __sub_confs() {
-	# powerline.conf is not used yet
 	cat <<EOF
 status
 binding
