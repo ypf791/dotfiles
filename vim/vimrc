@@ -1,3 +1,34 @@
+set background=dark
+
+syntax on
+
+set listchars=tab:>\ ,trail:~
+set list
+hi SpecialKey ctermfg=238
+
+set hlsearch
+noremap <F4> :set hlsearch! hlsearch?<CR>
+
+set nu
+hi LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE
+noremap <F3> :set relativenumber! relativenumber?<CR>
+
+set cursorline
+hi CursorLine cterm=NONE ctermbg=236
+
+hi DiffAdd cterm=none ctermbg=65
+hi DiffDelete cterm=none ctermfg=8 ctermbg=167
+hi DiffChange cterm=none ctermbg=96
+hi DiffText cterm=underline,bold ctermbg=96
+noremap <F2> :call IwhiteToggle() \| set diffopt?<CR>
+function! IwhiteToggle()
+	if &diffopt =~ 'iwhite'
+		set diffopt-=iwhite
+	else
+		set diffopt+=iwhite
+	endif
+endfunction
+
 set tabstop=4
 set shiftwidth=4
 set autoindent
