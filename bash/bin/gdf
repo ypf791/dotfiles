@@ -1,5 +1,6 @@
 #!/bin/bash
 
+thisBin="${BASH_SOURCE[0]}"
 tmpDirDef="${tmpDirDef:-${TMPDIR:-/tmp/}}"
 
 if [ "-w" = "$1" ]; then
@@ -70,18 +71,7 @@ if [ -n "$_oo_VERBOSE" ]; then
 	echo "force apply options --no-prompt --tool=vimdiff..."
 fi
 
-gdfCmd="git difftool"
-appendCmd="-y -x '_oo_VERBOSE=\"$_oo_VERBOSE\" \"`basename ${BASH_SOURCE[0]}`\" -w \"$tempDir\" \"\$BASE\"'"
-while [ 0 -lt $# ]; do
-	if [ "--" != "$1" ]; then
-		gdfCmd="$gdfCmd \"$1\""
-	else
-		gdfCmd="$gdfCmd $appendCmd --"
-		appendCmd=""
-	fi
-	shift
-done
-gdfCmd="$gdfCmd $appendCmd"
+gdfCmd=( git difftool -y -x "_oo_VERBOSE=\"$_oo_VERBOSE\" \"$thisBin\" -w \"$tempDir\" \"\$BASE\"" "$@" )
 
 create_vimrc() {
 	if [ 0 -eq $# ]; then
@@ -102,11 +92,11 @@ create_vimrc() {
 }
 
 cd $gitRoot
-gdfCmdResult="$(eval "$gdfCmd")"
+gdfCmdResult="$("${gdfCmd[@]}")"
 create_vimrc $gdfCmdResult > "$tempRc"
 if [ -n "$_oo_VERBOSE" ]; then
 	echo "[gdfCmd]"
-	echo "$gdfCmd"
+	echo "${gdfCmd[*]}"
 	echo
 	echo "[gdfCmdResult]"
 	echo "$gdfCmdResult"
