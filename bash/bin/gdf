@@ -50,16 +50,22 @@ else
 	exit $?
 fi
 
-if [ 'Darwin' = `uname -s` ]; then
-	tempDir=`mktemp -d -t "gdf"` || exit 1
-	tempRc=`mktemp -t "gdf.vim"` || exit 1
-else
-	tempDir=`mktemp -d -p $tmpDirDef -t "gdf_XXXX"` || exit 1
-	tempRc=`mktemp -p $tempDir -t "vim.XXXX"` || exit 1
-fi
+MakeTempDir()
+{
+	local tplPrefix="$1"; shift
+
+	if [ "$(uname -s)" = Darwin ]; then
+		mktemp -d -t "$tplPrefix"
+	else
+		mktemp -d --tmpdir -- "$tplPrefix.XXXXXXXX"
+	fi
+}
+
+tempDir="$(MakeTempDir "gdf")"
+tempDirDiff="$tempDir/diff"
+tempDirVimRC="$tempDir/vimrc"
 
 _exit() {
-	rm -f "$tempRc"
 	rm -rf "$tempDir"
 	exit $1
 }
@@ -67,9 +73,15 @@ _exit() {
 if [ -n "$_oo_VERBOSE" ]; then
 	echo "invoking git-difftool..."
 	echo "force apply options --no-prompt --tool=vimdiff..."
+	echo
 fi
 
-gdfCmd=( git difftool -y -x "_oo_VERBOSE=\"$_oo_VERBOSE\" \"$thisBin\" -w \"$tempDir\" \"\$BASE\"" "$@" )
+gdfCmd=( git difftool -y -x "_oo_VERBOSE=\"$_oo_VERBOSE\" \"$thisBin\" -w \"$tempDirDiff\" \"\$BASE\"" "$@" )
+if [ -n "$_oo_VERBOSE" ]; then
+	echo "[gdfCmd]"
+	echo "${gdfCmd[*]}"
+	echo
+fi
 
 create_vimrc() {
 	if [ 0 -eq $# ]; then
@@ -90,21 +102,22 @@ create_vimrc() {
 }
 
 gdfCmdResult="$("${gdfCmd[@]}")"
-create_vimrc $gdfCmdResult > "$tempRc"
 if [ -n "$_oo_VERBOSE" ]; then
-	echo "[gdfCmd]"
-	echo "${gdfCmd[*]}"
-	echo
 	echo "[gdfCmdResult]"
 	echo "$gdfCmdResult"
 	echo
-	echo "[vimrc ($tempRc)]"
-	cat "$tempRc"
 fi
 
-if [ -s "$tempRc" ]; then
+create_vimrc $gdfCmdResult > "$tempDirVimRC"
+if [ -n "$_oo_VERBOSE" ]; then
+	echo "[vimrc ($tempDirVimRC)]"
+	cat "$tempDirVimRC"
+	echo
+fi
+
+if [ -s "$tempDirVimRC" ]; then
 	if [ -z "$_oo_DRYRUN" ]; then
-		vim -S "$tempRc"
+		vim -S "$tempDirVimRC"
 	fi
 else
 	echo "No difference found !" >&2
