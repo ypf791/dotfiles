@@ -35,6 +35,14 @@ if [ "-w" = "$1" ]; then
 	exit 0
 fi
 
+if [ "-n" = "$1" ]; then
+	if [ "$2" -eq "$2" ]; then
+		set -- "@~$2" "@~$(($2 - 1))"
+	else
+		exit $?
+	fi
+fi
+
 gitRoot=
 if ! gitRoot=`git rev-parse --git-dir`; then
 	exit $?
