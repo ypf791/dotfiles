@@ -13,7 +13,12 @@ PLUGINS= \
 	xterm-color-table \
 	NERDTree \
 	taboo \
-	tagbar
+	tagbar \
+	scss-syntax.vim \
+	vim-apparmor \
+	vim-diff-enhanced \
+	vim-javascript-syntax \
+	vim-vue
 PLUGINS_DIR=home/.vim/bundle
 
 .PHONY: first
