@@ -44,13 +44,12 @@ if [ "-n" = "$1" ]; then
 	fi
 fi
 
-gitRoot=
-if ! gitRoot=`git rev-parse --git-dir`; then
+if gitRoot="$(git rev-parse --show-cdup)"; then
+	cd "${gitRoot:-.}" || exit 1
+else
 	exit $?
 fi
-gitRoot=`dirname $gitRoot`
 
-cd $gitRoot
 if [ 'Darwin' = `uname -s` ]; then
 	tempDir=`mktemp -d -t "gdf"` || exit 1
 	tempRc=`mktemp -t "gdf.vim"` || exit 1
@@ -58,7 +57,6 @@ else
 	tempDir=`mktemp -d -p $tmpDirDef -t "gdf_XXXX"` || exit 1
 	tempRc=`mktemp -p $tempDir -t "vim.XXXX"` || exit 1
 fi
-cd - >/dev/null
 
 _exit() {
 	rm -f "$tempRc"
@@ -91,7 +89,6 @@ create_vimrc() {
 	echo "tabclose"
 }
 
-cd $gitRoot
 gdfCmdResult="$("${gdfCmd[@]}")"
 create_vimrc $gdfCmdResult > "$tempRc"
 if [ -n "$_oo_VERBOSE" ]; then
