@@ -1,39 +1,146 @@
 #!/bin/bash
 
 thisBin="${BASH_SOURCE[0]}"
-tmpDirDef="${tmpDirDef:-${TMPDIR:-/tmp/}}"
 
-if [ "-w" = "$1" ]; then
+export _oo_VERBOSE
+
+VerboseLog()
+{
 	if [ -n "$_oo_VERBOSE" ]; then
-		echo "[arguments for -w]" >&2
-		echo "$*" >&2
+		for log in "$@"; do
+			echo "$log" >&2
+		done
 		echo >&2
 	fi
+}
 
-	shift
-	wrapDir="$1"; shift
-	base="$1"; shift
+Link()
+{
+	VerboseLog "Linking $1" "     => $2"
+	ln "$1" "$2"
+}
 
-	echo -n "$base "
-	for i in lhs rhs; do
-		filepath="$1"; shift
+Copy()
+{
+	VerboseLog "Copying $1" "     => $2"
+	cp "$1" "$2"
+}
 
-		if [ "$filepath" = "$base" ] || [ "$filepath" = "/dev/null" ]; then
-			echo -n "$filepath "
-		else
-			{
-				mkdir -p ${_oo_VERBOSE:+-v} "$wrapDir/$i"
-				mkdir -p ${_oo_VERBOSE:+-v} "$(dirname "$wrapDir/$i/$base")"
-				if ! ln ${_oo_VERBOSE:+-v} "$filepath" "$wrapDir/$i/$base"; then
-					cp ${_oo_VERBOSE:+-v} "$filepath" "$wrapDir/$i/$base"
-				fi
-			} >&2
-			echo -n "$wrapDir/$i/$base "
-		fi
+HardLinkOrCopy()
+{
+	local src="$1"; shift
+	local dst="$1"; shift
+
+	mkdir -p ${_oo_VERBOSE:+-v} "$(dirname "$dst")"
+	Link "$src" "$dst" || Copy "$src" "$dst"
+}
+
+Collect()
+{
+	{
+	VerboseLog "[collect ($BASE)]" "Args: $*"
+
+	local tempDirDiff="$1"; shift
+	local lhs="$1"; shift
+	local rhs="$1"; shift
+
+	if [ "$lhs" != "$BASE" ] && [ "$lhs" != "/dev/null" ]; then
+		HardLinkOrCopy "$lhs" "$tempDirDiff/lhs/$BASE"
+		lhs="$tempDirDiff/lhs/$BASE"
+	fi
+	if [ "$rhs" != "$BASE" ] && [ "$rhs" != "/dev/null" ]; then
+		HardLinkOrCopy "$rhs" "$tempDirDiff/rhs/$BASE"
+		rhs="$tempDirDiff/rhs/$BASE"
+	fi
+	} >&2
+
+	echo "$BASE"
+	echo "$lhs"
+	echo "$rhs"
+}
+
+MakeTempDir()
+{
+	local tplPrefix="$1"; shift
+
+	if [ "$(uname -s)" = Darwin ]; then
+		mktemp -d -t "$tplPrefix"
+	else
+		mktemp -d --tmpdir -- "$tplPrefix.XXXXXXXX"
+	fi
+}
+
+WithTempDir()
+{
+	local prefix="$1"; shift
+
+	if [ "$2" != "_1" ]; then
+		echo "Invalid command format (missing placeholder): $*"
+		return 1
+	fi
+	if tempDir="$(MakeTempDir "$prefix")"; then
+		local command="$1"; shift 2
+		(
+			"$command" "$tempDir" "$@"
+			exit $?
+		)
+		ret=$?
+		rm -rf "$tempDir"
+		return "$ret"
+	else
+		echo "Failed to make temporary directory"
+		return 1
+	fi
+}
+
+CreateVimRC()
+{
+	echo "au! BufEnter *"
+	while IFS= read -r base; do
+		IFS= read -r lhs
+		IFS= read -r rhs
+		echo "tabe $rhs"
+		echo "vert diffsplit $lhs"
+		echo 'if exists(":TabooRename")'
+		echo "	TabooRename $base"
+		echo 'endif'
 	done
-	echo
+	echo "tabfirst"
+	echo "tabclose"
+}
 
-	exit 0
+Main()
+{
+	local tempDir="$1"; shift
+
+	local tempDirDiff="$tempDir/diff"
+	local tempDirVimRC="$tempDir/vimrc"
+
+	VerboseLog "invoking 'git difftool --no-prompt'"
+
+	gdfCmd=( git difftool -y -x "'$thisBin' -c '$tempDirDiff'" "$@" )
+	VerboseLog "[gdfCmd]" "${gdfCmd[*]}"
+
+	gdfCmdResult="$("${gdfCmd[@]}")"
+	VerboseLog "[gdfCmdResult]" "$gdfCmdResult"
+
+	if [ -z "$gdfCmdResult" ]; then
+		echo "No difference found !"
+		return 0
+	fi
+
+	echo "$gdfCmdResult" | CreateVimRC > "$tempDirVimRC"
+	VerboseLog "[vimrc ($tempDirVimRC)]" "$(cat "$tempDirVimRC")"
+
+	if [ -z "$_oo_DRYRUN" ]; then
+		vim -S "$tempDirVimRC"
+	fi
+}
+
+if [ "-c" = "$1" ]; then
+	shift
+	Collect "$@"
+	exit $?
 fi
 
 if [ "-n" = "$1" ]; then
@@ -50,77 +157,4 @@ else
 	exit $?
 fi
 
-MakeTempDir()
-{
-	local tplPrefix="$1"; shift
-
-	if [ "$(uname -s)" = Darwin ]; then
-		mktemp -d -t "$tplPrefix"
-	else
-		mktemp -d --tmpdir -- "$tplPrefix.XXXXXXXX"
-	fi
-}
-
-tempDir="$(MakeTempDir "gdf")"
-tempDirDiff="$tempDir/diff"
-tempDirVimRC="$tempDir/vimrc"
-
-_exit() {
-	rm -rf "$tempDir"
-	exit $1
-}
-
-if [ -n "$_oo_VERBOSE" ]; then
-	echo "invoking git-difftool..."
-	echo "force apply options --no-prompt --tool=vimdiff..."
-	echo
-fi
-
-gdfCmd=( git difftool -y -x "_oo_VERBOSE=\"$_oo_VERBOSE\" \"$thisBin\" -w \"$tempDirDiff\" \"\$BASE\"" "$@" )
-if [ -n "$_oo_VERBOSE" ]; then
-	echo "[gdfCmd]"
-	echo "${gdfCmd[*]}"
-	echo
-fi
-
-create_vimrc() {
-	if [ 0 -eq $# ]; then
-		return 1
-	fi
-
-	echo "au! BufEnter *"
-	while [ $# -ge 3 ]; do
-		echo "tabe $3"
-		echo "vert diffsplit $2"
-		echo "if exists(\":TabooRename\")"
-		echo "	TabooRename $1"
-		echo "endif"
-		shift 3
-	done
-	echo "tabfirst"
-	echo "tabclose"
-}
-
-gdfCmdResult="$("${gdfCmd[@]}")"
-if [ -n "$_oo_VERBOSE" ]; then
-	echo "[gdfCmdResult]"
-	echo "$gdfCmdResult"
-	echo
-fi
-
-create_vimrc $gdfCmdResult > "$tempDirVimRC"
-if [ -n "$_oo_VERBOSE" ]; then
-	echo "[vimrc ($tempDirVimRC)]"
-	cat "$tempDirVimRC"
-	echo
-fi
-
-if [ -s "$tempDirVimRC" ]; then
-	if [ -z "$_oo_DRYRUN" ]; then
-		vim -S "$tempDirVimRC"
-	fi
-else
-	echo "No difference found !" >&2
-fi
-
-_exit 0
+WithTempDir "gdf" Main _1 "$@"
