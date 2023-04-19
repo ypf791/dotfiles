@@ -109,7 +109,7 @@ CreateVimRC()
 	echo "tabclose"
 }
 
-Main()
+LaunchDiffToolMode()
 {
 	local tempDir="$1"; shift
 
@@ -151,10 +151,21 @@ if [ "-n" = "$1" ]; then
 	fi
 fi
 
-if gitRoot="$(git rev-parse --show-cdup)"; then
-	cd "${gitRoot:-.}" || exit 1
-else
-	exit $?
-fi
+Main()
+{
+	local tempDir="$1"; shift
+
+	if gitRoot="$(git rev-parse --show-cdup)"; then
+		cd "${gitRoot:-.}" || exit 1
+	else
+		exit $?
+	fi
+
+	if git diff --quiet --diff-filter=U "$@"; then
+		LaunchDiffToolMode "$tempDir" "$@"
+	else
+		LaunchDiffToolMode "$tempDir" --base "$@"
+	fi
+}
 
 WithTempDir "gdf" Main _1 "$@"
