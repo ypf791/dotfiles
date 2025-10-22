@@ -144,9 +144,14 @@ if [ "-c" = "$1" ]; then
 fi
 
 if [ "-n" = "$1" ]; then
-	if [ "$2" -eq "$2" ]; then
-		set -- "@~$2" "@~$(($2 - 1))"
+	if [ "$2" -ge 1 ]; then
+		if [ "$2" -eq 1 ] && git diff --quiet; then
+			set -- "@^"
+		else
+			set -- "@~$2" "@~$(($2 - 1))"
+		fi
 	else
+		echo "Invalid option: expected positive integer but '$2'" >&2
 		exit $?
 	fi
 fi
