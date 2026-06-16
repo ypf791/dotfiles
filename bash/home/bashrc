@@ -17,6 +17,10 @@ shopt -s histappend
 HISTSIZE=1000
 HISTFILESIZE=2000
 
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
@@ -48,31 +52,21 @@ if [ -n "$force_color_prompt" ]; then
 	fi
 fi
 
-# override PS1 before its being typed
-__oo_prompt_cmd() {
-	local RET=$?
-
-	local PS1_CHROOT='${debian_chroot:+($debian_chroot)}'
-	local PS1_USERHOST='[\u@\h \A]'
-	local PS1_RET='[$(printf "%2x" '"$RET"')]'
-	local PS1_PATH='[\w]'
-	local PS1_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-
-	local C_USERHOST='\[\e[0;36m\]'
-	local C_RET='\[\e[93m\]'
-	local C_PATH='\[\e[1;34m\]'
-	local C_BRANCH='\[\e[1;30m\]'
-	local C_DEFAULT='\[\e[0m\]'
-
-	[ $RET -eq 0 ] || C_RET='\[\e[91m\]'
-
-	PS1="\n${PS1_CHROOT}${C_USERHOST}${PS1_USERHOST}${C_RET}${PS1_RET}${C_PATH}${PS1_PATH}${C_BRANCH}${PS1_BRANCH:+[${PS1_BRANCH}]}${C_DEFAULT}\n\$ "
-}
-
 if [ "$color_prompt" = yes ]; then
-	PROMPT_COMMAND=__oo_prompt_cmd
+	PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+	PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+	xterm*|rxvt*)
+		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+		;;
+	*)
+		;;
+esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -101,10 +95,7 @@ fi
 
 # User-defined scripts
 if [ -d ~/.bashrc.d ]; then
-	for f in `ls ~/.bashrc.d`; do
-		[ -f ~/.bashrc.d/$f ] && . ~/.bashrc.d/$f
+	for f in ~/.bashrc.d/*; do
+		[ -f "$f" ] && . "$f"
 	done
 fi
-
-# export locale for date format
-export LC_TIME=en_US.UTF-8
