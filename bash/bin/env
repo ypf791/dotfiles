@@ -1,0 +1,11 @@
+#!/bin/bash
+# add binaries to PATH if they aren't added yet
+# affix colons on either side of $PATH to simplify matching
+case ":${PATH}:" in
+	*:"$(dirname $(readlink -f "${BASH_SOURCE[0]}"))":*)
+		;;
+	*)
+		# Prepending path in case a system-installed binary needs to be overridden
+		export PATH="$(dirname $(readlink -f "${BASH_SOURCE[0]}")):$PATH"
+		;;
+esac
