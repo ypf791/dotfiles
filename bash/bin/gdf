@@ -99,10 +99,10 @@ CreateVimRC()
 	while IFS= read -r base; do
 		IFS= read -r lhs
 		IFS= read -r rhs
-		echo "tabe $rhs"
-		echo "vert diffsplit $lhs"
+		echo "tabe ${rhs/\%/\\\%}"
+		echo "vert diffsplit ${lhs/\%/\\\%}"
 		echo 'if exists(":TabooRename")'
-		echo "	TabooRename $base"
+		echo "	TabooRename ${base/\%/\\\%}"
 		echo 'endif'
 	done
 	echo "tabfirst"
