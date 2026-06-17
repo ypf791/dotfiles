@@ -1,0 +1,6 @@
+# vim/editor swap & backup files
+*.sw[a-p]
+*~
+
+# macOS
+.DS_Store
