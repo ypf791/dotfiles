@@ -68,16 +68,20 @@ case "$TERM" in
 		;;
 esac
 
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
+# enable color support of ls and also add handy aliases.
+# Pick the LS_COLORS source by environment: GNU dircolors where available,
+# else ~/.dircolors_mac.sh (e.g. macOS, which has no dircolors command).
+if command -v dircolors >/dev/null 2>&1; then
 	test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
 	alias ls='ls --color=auto'
-	#alias dir='dir --color=auto'
-	#alias vdir='vdir --color=auto'
-
 	alias grep='grep --color=auto'
 	alias fgrep='fgrep --color=auto'
 	alias egrep='egrep --color=auto'
+elif [ -r ~/.dircolors_mac.sh ]; then
+	. ~/.dircolors_mac.sh
+	export CLICOLOR=1
+	alias ls='ls -G'
+	alias grep='grep --color=auto'
 fi
 
 # some more ls aliases
