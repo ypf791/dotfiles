@@ -1,3 +1,6 @@
+# Shared git config (aliases), deployed to ~/.config/git/config (XDG global).
+# Per-machine identity ([user]) goes in ~/.gitconfig via `git config --global`;
+# git reads both, and ~/.gitconfig is not committed.
 [alias]
 	aa = add --all
 	st = status
