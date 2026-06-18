@@ -43,6 +43,13 @@ install_pkgs() {
 	esac
 }
 
+# Without -k, ask whether to set up an SSH key.
+if [ -z "$UseSSHKey" ]; then
+	read -p "Generate an SSH key and clone over SSH? (y/N) " _ans
+	case "$_ans" in [Yy]*) UseSSHKey=on ;; esac
+	unset _ans
+fi
+
 case `uname -s` in
 Darwin)
 	if ! command -v brew >/dev/null; then
