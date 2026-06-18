@@ -5,7 +5,7 @@
 #   ./install.sh all        # everything
 set -e
 cd "$(dirname "$0")"
-ALL=(bash git tmux vim gj zsh)
+ALL=(bash git tig tmux vim gj zsh)
 
 if [ "$#" -gt 0 ]; then
 	[ "$1" = all ] && selected=("${ALL[@]}") || selected=("$@")

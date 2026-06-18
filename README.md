@@ -2,7 +2,7 @@
 
 Personal dotfiles for Linux and macOS, deployed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-Each top-level directory (`bash`, `git`, `tmux`, `vim`, `gj`, `zsh`) is a **Stow
+Each top-level directory (`bash`, `git`, `tig`, `tmux`, `vim`, `gj`, `zsh`) is a **Stow
 package** mirroring your home directory. `install.sh` symlinks the packages you
 choose into `$HOME`, so editing a file in this repo takes effect immediately.
 
@@ -45,6 +45,7 @@ Then `cd dotfiles && ./install.sh` as in [Quick start](#quick-start).
 |---|---|
 | **bash** | a comfortable shell — informative prompt, aliases, and the [`bin/` tools](#bin-tools) on your `PATH` |
 | **git**  | short aliases for everyday commands and nicer log views |
+| **tig**  | a key binding for the tig Git browser (`F5` diffs the selected commit) |
 | **tmux** | ergonomic key bindings (`C-a` prefix) and a custom status bar |
 | **vim**  | a ready-to-use editor — color scheme, file-tree and tag sidebars, and a few F-key toggles |
 | **gj**   | the `gj` code-search command on your `PATH` |
