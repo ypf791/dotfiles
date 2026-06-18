@@ -97,9 +97,15 @@ if [ -f ~/.bash_aliases ]; then
 	. ~/.bash_aliases
 fi
 
-# User-defined scripts
+# User-defined scripts. Report anything that can't be sourced (e.g. an orphaned
+# symlink left after a file is removed) by name, instead of skipping it silently.
 if [ -d ~/.bashrc.d ]; then
 	for f in ~/.bashrc.d/*; do
-		[ -f "$f" ] && . "$f"
+		if [ -f "$f" ]; then
+			. "$f"
+		else
+			echo "bashrc.d: cannot source $f (orphaned symlink?)" >&2
+			false
+		fi
 	done
 fi
