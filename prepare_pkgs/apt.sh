@@ -43,6 +43,9 @@ apt install -y          \
 	vim                 \
 	apache2
 
+# stow: deploys these dotfiles (install.sh relies on it)
+apt install -y stow
+
 # Note: system-config-samba seems not exists on new Ubuntu
 apt install -y \
 	system-config-samba
