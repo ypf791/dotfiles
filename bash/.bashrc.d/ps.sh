@@ -23,6 +23,7 @@ __oo_prompt_cmd() {
     local C_DEFAULT='\[\e[0m\]'
 
     [ $RET -eq 0 ] || C_RET='\[\e[91m\]'
+    [ "$EUID" -eq 0 ] && C_USERHOST='\[\e[1;31m\]'   # root: red user@host
 
     PS1="\n${PS1_CHROOT}${C_USERHOST}${PS1_USERHOST}${C_RET}${PS1_RET}${C_PATH}${PS1_PATH}${C_BRANCH}${PS1_BRANCH:+[${PS1_BRANCH}]}${C_DEFAULT}\n\$ "
 }
