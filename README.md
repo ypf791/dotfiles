@@ -43,7 +43,7 @@ Then `cd dotfiles && ./install.sh` as in [Quick start](#quick-start).
 
 | Package | What you get |
 |---|---|
-| **bash** | a comfortable shell — informative prompt, aliases, a `to` directory-jump command, and the [`bin/` tools](#bin-tools) on your `PATH` |
+| **bash** | a comfortable shell — informative prompt, aliases, and the [`bin/` tools](#bin-tools) on your `PATH` |
 | **git**  | short aliases for everyday commands and nicer log views |
 | **tmux** | ergonomic key bindings (`C-a` prefix) and a custom status bar |
 | **vim**  | a ready-to-use editor — color scheme, file-tree and tag sidebars, and a few F-key toggles |
