@@ -12,4 +12,17 @@
 	la = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	ll = log --graph --decorate --pretty=oneline --abbrev-commit
 	lf = log --stat --decorate --format=fuller abbrev-commit
-	ls = log --graph --pretty=oneline --abbrev-commit --all
+	ls = log --graph --pretty=oneline --abbrev-commit
+	pr = pull --rebase
+	ffm = merge --ff-only
+	rc = rebase --continue
+	ri = rebase --interactive
+[core]
+	editor = vim
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[color]
+	ui = auto
